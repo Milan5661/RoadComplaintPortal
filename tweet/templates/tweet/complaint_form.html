@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <h2>Submit a Road Complaint</h2>
+    <form action="{% url 'submit_complaint' %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea>
+
+        <label for="image">Upload Image:</label>
+        <input type="file" id="image" name="image">
+
+        <label for="latitude">Latitude:</label>
+        <input type="text" id="latitude" name="latitude" readonly required>
+
+        <label for="longitude">Longitude:</label>
+        <input type="text" id="longitude" name="longitude" readonly required>
+
+        <button type="button" onclick="getLocation()">📍 Get My Location</button>
+
+        <button type="submit">Submit Complaint</button>
+    </form>
+
+    <script src="{% static 'js/location.js' %}"></script>
+{% endblock %}
