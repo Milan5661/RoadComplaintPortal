@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Complaints - Road Complaint Portal{% endblock %}
+
+{% block content %}
+<h1>Complaints</h1>
+<p>View submitted complaints here.</p>
+<!-- Complaints will be dynamically loaded here -->
+<div id="complaints-list"></div>
+
+<script>
+    fetch('/api/complaints/')
+        .then(response => response.json())
+        .then(data => {
+            let complaintsList = document.getElementById('complaints-list');
+            data.forEach(complaint => {
+                let div = document.createElement('div');
+                div.innerHTML = `<p><strong>${complaint.description}</strong> - ${complaint.location}</p>`;
+                complaintsList.appendChild(div);
+            });
+        });
+</script>
+{% endblock %}
