@@ -18,6 +18,28 @@ class ComplaintListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return Complaint.objects.all().order_by('-date_reported')
+def submit_complaint(request):
+    if request.method == "POST":
+        title = request.POST.get("title")
+        description = request.POST.get("description")
+        image = request.FILES.get("image")
+        latitude = request.POST.get("latitude")
+        longitude = request.POST.get("longitude")
+
+        if not title or not description or not latitude or not longitude:
+            return JsonResponse({"error": "Missing required fields"}, status=400)
+
+        complaint = Complaint.objects.create(
+            title=title,
+            description=description,
+            image=image,
+            latitude=latitude,
+            longitude=longitude,
+            user=request.user  # Assign the logged-in user
+        )
+        return JsonResponse({"message": "Complaint submitted successfully", "id": complaint.id})
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
 
 
 @csrf_exempt
@@ -41,7 +63,7 @@ def submit_complaint(request):
 
 # ✅ Fix for missing 'complaints_list' function
 def complaints_list(request):
-    complaints = Complaint.objects.all().values("id", "description", "image", "location", "created_at")
+    complaints = Complaint.objects.all().values("id", "description", "image", "location", "date_reported")
     return JsonResponse({"complaints": list(complaints)})
 
 # User Registration View

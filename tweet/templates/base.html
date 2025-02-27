@@ -11,9 +11,9 @@
     <nav>
         <ul>
             <li><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="{% url 'complaints_list' %}">Complaints</a></li>
+            <li><a href="{% url 'complaints_list' %}">View Complaints</a></li>
             <li><a href="{% url 'submit_complaint' %}">Submit Complaint</a></li>
-            <li><a href="{% url 'home' %}">Home</a></li>
+            
             {% if user.is_authenticated %}
                 <li><a href="{% url 'logout' %}">Logout</a></li>
             {% else %}

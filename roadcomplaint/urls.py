@@ -9,8 +9,7 @@ urlpatterns = [
     path('', index, name='home'),  # Home page route
     path('complaints/', ComplaintListCreateView.as_view(), name='complaints_list'),
     path('submit/', submit_complaint, name='submit_complaint'),
-    path('admin/', admin.site.urls),
-    path('', include('tweet.urls')), 
+    path('tweet/', include('tweet.urls')), 
 ]
 
 # Serve media files during development
