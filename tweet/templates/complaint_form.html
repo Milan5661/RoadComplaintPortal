@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Complaint</title>
+</head>
+<body>
+    <h2>Submit a Complaint</h2>
+    <form action="/tweet/submit/" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="text" name="description" placeholder="Describe the issue">
+        <input type="text" name="location" placeholder="Location">
+        <input type="file" name="image">
+        <button type="submit">Submit Complaint</button>
+    </form>
+    
+</body>
+</html>

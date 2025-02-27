@@ -1,55 +1,48 @@
 /* General Styles */
 body {
     font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+}
+
+/* Navbar */
+nav {
+    background-color: #333;
+    padding: 15px;
     text-align: center;
 }
 
-/* Navigation Bar */
-nav {
-    background-color: #333;
-    padding: 10px 0;
-}
-
-nav ul {
-    list-style: none;
-    padding: 0;
-}
-
-nav ul li {
-    display: inline;
-    margin: 0 15px;
-}
-
-nav ul li a {
+nav a {
     color: white;
     text-decoration: none;
-    font-size: 18px;
+    margin: 0 15px;
+    font-size: 16px;
+    transition: 0.3s;
 }
 
-nav ul li a:hover {
-    text-decoration: underline;
+nav a:hover {
+    color: #00c3ff;
 }
 
-/* Main Content */
-h1 {
-    color: #333;
-}
-
-/* Forms */
-form {
+/* Form Styling */
+.container {
+    width: 40%;
+    margin: 50px auto;
     background: white;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    display: inline-block;
-    margin-top: 20px;
 }
 
-input {
-    display: block;
+h2 {
+    text-align: center;
+    color: #333;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="file"] {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
@@ -57,30 +50,55 @@ input {
     border-radius: 5px;
 }
 
+/* Buttons */
 button {
-    background-color: #28a745;
-    color: white;
-    padding: 10px 20px;
+    width: 100%;
+    padding: 10px;
+    background: #28a745;
     border: none;
+    color: white;
+    font-size: 16px;
     border-radius: 5px;
     cursor: pointer;
+    transition: 0.3s;
 }
 
 button:hover {
-    background-color: #218838;
+    background: #218838;
 }
 
-/* Complaints List */
-#complaints-list, #admin-complaints-list {
-    margin: 20px auto;
-    width: 80%;
-    max-width: 600px;
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+    }
+    nav a {
+        display: block;
+        margin: 10px 0;
+    }
 }
 
-#complaints-list div, #admin-complaints-list div {
-    background: white;
-    padding: 15px;
+.container {
+    max-width: 400px;
+    margin: auto;
+    padding: 20px;
     border-radius: 8px;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
-    margin-bottom: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    background: #fff;
+}
+input, textarea, button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+button {
+    background: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+button:hover {
+    background: #218838;
 }
