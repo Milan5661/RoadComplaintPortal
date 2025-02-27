@@ -10,16 +10,18 @@
 
 </head>
 <body>
+    <li><a href="{% url 'index' %}">Home</a></li>
+
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'index' %}">Road Complaint Portal</a>
+            <a class="navbar-brand" href="{% url 'home' %}">Road Complaint Portal</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'complaints' %}">View Complaints</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'complaints_list' %}">View Complaints</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'complaint_form' %}">Submit Complaint</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
