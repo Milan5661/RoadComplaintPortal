@@ -1,15 +1,14 @@
 from django.contrib import admin
-from django.urls import path,include
-from tweet.views import index, ComplaintListCreateView, submit_complaint
+from django.urls import path, include
+from tweet.views import ComplaintListCreateView, submit_complaint
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', index, name='home'),  # Home page route
     path('complaints/', ComplaintListCreateView.as_view(), name='complaints_list'),
     path('submit/', submit_complaint, name='submit_complaint'),
-    path('', include('tweet.urls')), 
+    path('', include('tweet.urls')),  # This already includes the home page
 ]
 
 # Serve media files during development

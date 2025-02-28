@@ -22,7 +22,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'tweet',  # Your main app
+    'tweet',  
+    'accounts',
     'rest_framework',  # Django REST framework
 ]
 

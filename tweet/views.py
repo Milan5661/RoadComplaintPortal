@@ -98,3 +98,13 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('home')
+
+def complaints_view(request):
+    return render(request, 'complaints.html')
+
+from django.shortcuts import render
+from django.http import HttpResponse
+
+def home(request):
+    return HttpResponse("Welcome to the Road Complaint Portal")
+
