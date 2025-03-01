@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h2 class="dashboard-title">User Dashboard</h2>
+
+    <!-- Complaint Statistics -->
+    <div class="stats">
+        <div class="stat-card">
+            <h3>Total Complaints</h3>
+            <p>{{ total_complaints }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Resolved Complaints</h3>
+            <p>{{ resolved_complaints }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Pending Complaints</h3>
+            <p>{{ pending_complaints }}</p>
+        </div>
+    </div>
+
+    <!-- Complaints List -->
+    <div class="complaints-list">
+        <h3>Your Complaints</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Complaint</th>
+                    <th>Status</th>
+                    <th>Submitted On</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for complaint in complaints %}
+                <tr>
+                    <td>{{ complaint.description }}</td>
+                    <td>
+                        {% if complaint.status == "Resolved" %}
+                            <span class="status resolved">Resolved</span>
+                        {% else %}
+                            <span class="status pending">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ complaint.date_reported }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Submit Complaint Button -->
+    <div class="new-complaint">
+        <a href="{% url 'complaint_form' %}" class="btn">Submit a New Complaint</a>
+    </div>
+</div>
+{% endblock %}

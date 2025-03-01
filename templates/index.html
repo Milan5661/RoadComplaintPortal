@@ -1,0 +1,17 @@
+<!-- {% extends 'base.html' %}
+
+{% block title %}Home - Road Complaint Portal{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container">
+        <h1>Welcome to the Road Complaint Portal</h1>
+        <p>Report road issues in your area and help make roads safer.</p>
+        {% if user.is_authenticated %}
+            <a href="{% url 'submit_complaint' %}" class="btn">Submit a Complaint</a>
+        {% else %}
+            <a href="{% url 'register' %}" class="btn">Get Started</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %} !>?

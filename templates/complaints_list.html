@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Complaints List - Road Complaint Portal{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Complaints List</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Complaint</th>
+                <th>Image</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for complaint in complaints %}
+            <tr>
+                <td>{{ complaint.description }}</td>
+                <td><img src="{{ complaint.image.url }}" alt="Complaint Image" width="100"></td>
+                <td>{{ complaint.status }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="text-center">No complaints submitted yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

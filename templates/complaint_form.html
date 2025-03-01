@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit Complaint - Road Complaint Portal{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg p-4">
+                <h3 class="text-center mb-4">Report a Road Issue</h3>
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Complaint Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Upload Image</label>
+                        <input type="file" class="form-control" id="image" name="image" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Select Location</label>
+                        <input type="text" class="form-control" id="location" name="location" placeholder="Enter or pick your location" required>
+                        <button type="button" class="btn btn-secondary mt-2" onclick="getLocation()">Use Current Location</button>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Submit Complaint</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                document.getElementById("location").value = position.coords.latitude + ", " + position.coords.longitude;
+            });
+        } else {
+            alert("Geolocation is not supported by your browser.");
+        }
+    }
+</script>
+
+{% endblock %}

@@ -45,7 +45,7 @@ ROOT_URLCONF = 'roadcomplaint.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'tweet', 'templates')],  # Ensure this points to the correct location
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -78,22 +78,25 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = 'en-us'  # Keep language as English
+TIME_ZONE = 'Asia/Kathmandu'  # Set time zone to Nepal
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JS, Images)
+
+
+
+
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'tweet', 'static'),  # This is where your CSS and JS should be
-]
+STATICFILES_DIRS = [BASE_DIR / "static"]
+
+#STATIC_ROOT = BASE_DIR / "staticfiles"
+
 
 # Media files (for user uploads like images)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Authentication settings
-LOGIN_URL = 'login'  # The login page URL name (from `urls.py`)
-LOGIN_REDIRECT_URL = 'dashboard'  # Redirect users to the dashboard after login
-LOGOUT_REDIRECT_URL = 'index'  # Redirect users to home page after logout
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+LOGIN_URL = '/login/'

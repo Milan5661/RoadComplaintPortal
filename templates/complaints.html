@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Complaints - Road Complaint Portal{% endblock %}
+
+{% block content %}
+<section class="complaints-section">
+    <div class="container">
+        <h2>Recent Complaints</h2>
+        <ul class="complaint-list">
+            {% for complaint in complaints %}
+            <li>
+                <h3>Complaint #{{ complaint.id }}</h3>
+                <p><strong>Description:</strong> {{ complaint.description }}</p>
+                <p><strong>Location:</strong> {{ complaint.location }}</p>
+                {% if complaint.image %}
+                <img src="{{ complaint.image.url }}" alt="Complaint Image" class="complaint-image">
+                {% endif %}
+                <p><strong>Date Reported:</strong> {{ complaint.date_reported }}</p>
+                <p><strong>Status:</strong> {{ complaint.status }}</p>
+            </li>
+            {% empty %}
+            <p>No complaints found.</p>
+            {% endfor %}
+        </ul>
+    </div>
+</section>
+{% endblock %}
