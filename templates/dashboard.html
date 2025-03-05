@@ -5,7 +5,7 @@
 {% block content %}
 <div class="dashboard-container">
     <h2 class="dashboard-title">User Dashboard</h2>
-
+    
     <!-- Complaint Statistics -->
     <div class="stats">
         <div class="stat-card">
@@ -24,7 +24,7 @@
 
     <!-- Complaints List -->
     <div class="complaints-list">
-        <h3>Your Complaints</h3>
+        
         <table>
             <thead>
                 <tr>
@@ -50,10 +50,32 @@
             </tbody>
         </table>
     </div>
-
-    <!-- Submit Complaint Button -->
-    <div class="new-complaint">
-        <a href="{% url 'complaint_form' %}" class="btn">Submit a New Complaint</a>
+    <div class="dashboard-container">
+        <h2>Complaint Dashboard</h2>
+        
+     <!-- Submit Complaint Button -->
+     <div class="new-complaint">
+        <a href="{% url 'submit_complaint' %}" class="btn">Submit a New Complaint</a>
     </div>
 </div>
+    
+    <script>
+        function initMap() {
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 0, lng: 0 },
+                zoom: 2
+            });
+    
+            {% for complaint in complaints %}
+                var complaintLocation = { lat: {{ complaint.latitude }}, lng: {{ complaint.longitude }} };
+                var marker = new google.maps.Marker({
+                    position: complaintLocation,
+                    map: map,
+                    title: '{{ complaint.description }}'
+                });
+            {% endfor %}
+        }
+    </script>
+
+   
 {% endblock %}

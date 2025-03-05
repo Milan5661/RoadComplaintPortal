@@ -10,6 +10,7 @@ class Complaint(models.Model):
     
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     description = models.TextField()
+    address = models.CharField(max_length=255, blank=True, null=True) 
     image = models.ImageField(upload_to='complaint_images/', null=True, blank=True)
     date_reported = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')

@@ -3,21 +3,26 @@
 
 {% block content %}
 <div class="d-flex justify-content-center align-items-center vh-100">
-    <div class="card shadow-lg p-4" style="width: 350px;">
-        <h3 class="text-center mb-4">Login</h3>
-        <form method="POST">
+    <div class="card shadow-lg p-5" style="width: 450px; min-height: 600px; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <h2 class="text-center mb-4 font-weight-bold" style="color: #3b5998;">Login</h2>
+        
+        <form method="POST" class="w-100">
             {% csrf_token %}
-            <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="username" name="username" required>
+            <div class="mb-4">
+                <label for="username" class="form-label fw-bold">Username</label>
+                <input type="text" class="form-control form-control-lg p-3" id="username" name="username" required>
             </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required>
+            <div class="mb-4">
+                <label for="password" class="form-label fw-bold">Password</label>
+                <input type="password" class="form-control form-control-lg p-3" id="password" name="password" required>
             </div>
-            <button type="submit" class="btn btn-primary w-100">Login</button>
+            <button type="submit" class="btn btn-primary btn-lg w-100 py-3 mt-2" style="background-color: #3b5998; border-radius: 6px;">Login</button>
         </form>
-        <p class="text-center mt-3">Don't have an account? <a href="{% url 'register' %}">Sign up</a></p>
+        
+        <div class="text-center mt-4">
+            <p class="text-muted">Don't have an account? <a href="{% url 'register' %}" class="text-primary fw-bold">Sign up</a></p>
+            <p><a href="{% url 'password_reset' %}" class="text-danger fw-bold">Forgot Password?</a></p>
+        </div>
     </div>
 </div>
 {% endblock %}

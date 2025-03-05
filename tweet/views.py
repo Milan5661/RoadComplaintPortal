@@ -1,116 +1,97 @@
-# Debugged and Integrated Code for Road Complaint Portal
-
 from django.shortcuts import render, redirect
 from rest_framework import generics
 from .models import Complaint
 from .serializers import ComplaintSerializer
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .forms import ComplaintForm
-import json
 from django.contrib import messages
+from django.http import JsonResponse
 
-# Home Page
+# 🌍 Home Page
 def index(request):
     return render(request, 'base.html')
 
-# Complaint Form View (For Web)
-@login_required  # Ensures user must be logged in
+#Complaint Form
+@login_required
 def complaint_form(request):
+    form = ComplaintForm()
+
     if request.method == "POST":
         form = ComplaintForm(request.POST, request.FILES)
         if form.is_valid():
-            # Don't save to DB yet
             complaint = form.save(commit=False)
-            # Assign the logged-in user
             complaint.user = request.user
-            # Now save
             complaint.save()
-            return redirect("complaints_list")  # Or wherever you want to redirect
-    else:
-        form = ComplaintForm()
+            messages.success(request, "Complaint submitted successfully!")
+            return redirect("tweet:complaints-list")
+        else:
+            messages.error(request, "Error submitting complaint. Please try again.")
 
     return render(request, "complaint_form.html", {"form": form})
 
-# API: List & Create Complaints
-class ComplaintListCreateView(generics.ListCreateAPIView):
-    queryset = Complaint.objects.all().order_by('-date_reported')
-    serializer_class = ComplaintSerializer
-
-# Complaint Submission
-
-
-@login_required  # Ensures user must be logged in to submit a complaint
+#Submit Complaint with Geolocation
+@login_required
 def submit_complaint(request):
     if request.method == "POST":
         description = request.POST.get("description")
         image = request.FILES.get("image")
+        address=request.FILES.get("address")
+        latitude = request.POST.get("latitude")
+        longitude = request.POST.get("longitude")
 
         if not description or not image:
             return render(request, "complaint_form.html", {"error": "All fields are required."})
 
-        # Create and save complaint with logged-in user
+        # Save complaint with location data
         complaint = Complaint(
-            user=request.user,  # Assign current logged-in user
+            user=request.user,
             description=description,
-            image=image
+            image=image,
+            address=address,
+            latitude=latitude,
+            longitude=longitude
         )
         complaint.save()
-        return redirect("complaints_list")  # Redirect to complaints list after submission
+        return redirect("tweet:complaints-list")
 
     return render(request, "complaint_form.html")
 
-# API: List Complaints
+# 🔍 View Complaints
 def complaints_list(request):
-    complaints = Complaint.objects.all().order_by("date_reported")  # Fetch all complaints (latest first)
+    complaints = Complaint.objects.all().order_by('-date_reported')
     return render(request, "complaints_list.html", {"complaints": complaints})
 
-# User Registration View
+# User Authentication Views
 def register_view(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('base')
+            return redirect('home')
     else:
         form = UserCreationForm()
     return render(request, 'register.html', {'form': form})
 
-# User Login View
 def login_view(request):
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('base')
+            return redirect('home')
     else:
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
 
-# User Logout View
 @login_required
 def logout_view(request):
     logout(request)
     return redirect('home')
 
-# View for displaying complaints
-def complaints_view(request):
-    complaints = Complaint.objects.all()
-    return render(request, 'complaints.html', {'complaints': complaints})
-
-# Homepage
-def home(request):
-    return render(request, 'home.html')
-
-def complaints(request):
-    all_complaints = Complaint.objects.all()
-    return render(request, "complaints.html", {"complaints": all_complaints})
-
+# Dashboard for Users
 @login_required
 def dashboard(request):
     user_complaints = Complaint.objects.filter(user=request.user)
@@ -119,10 +100,21 @@ def dashboard(request):
     resolved_complaints = user_complaints.filter(status="Resolved").count()
     pending_complaints = user_complaints.filter(status="Pending").count()
 
-    context = {
+    complaints = {
         "complaints": user_complaints,
         "total_complaints": total_complaints,
         "resolved_complaints": resolved_complaints,
         "pending_complaints": pending_complaints,
     }
-    return render(request, "dashboard.html", context)
+    return render(request, "dashboard.html", {'complaints': complaints})
+
+def home(request):
+    return render(request, "home.html")
+
+def get_complaints(request):
+    complaints = list(Complaint.objects.values("latitude", "longitude", "description"))
+    return JsonResponse(complaints, safe=False)
+
+class ComplaintListCreateView(generics.ListCreateAPIView):
+    queryset = Complaint.objects.all().order_by('-date_reported')
+    serializer_class = ComplaintSerializer
