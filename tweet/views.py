@@ -118,3 +118,15 @@ def get_complaints(request):
 class ComplaintListCreateView(generics.ListCreateAPIView):
     queryset = Complaint.objects.all().order_by('-date_reported')
     serializer_class = ComplaintSerializer
+from django.shortcuts import render
+
+
+# Hide header/footer for login, register, and logout pages
+def login_view(request):
+    return render(request, 'login.html', {'exclude_header_footer': True})
+
+def register_view(request):
+    return render(request, 'register.html', {'exclude_header_footer': True})
+
+def logout_view(request):
+    return render(request, 'logout.html', {'exclude_header_footer': True})

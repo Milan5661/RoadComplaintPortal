@@ -2,8 +2,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDsY9kHKIPb2WIaw5IwOugiYydc4YWw6Pkcallback=initMap" async defer></script>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Road Complaint Portal{% endblock %}</title>
@@ -12,9 +10,27 @@
 <body>
     {% include 'navbar.html' %}  <!-- Include Navbar Here -->
     <script src="{% static 'js/script.js' %}"></script>
-    <div class="content">
-        {% block content %}
+    <div class="milan">
+        {% block milan %}
         {% endblock %}
     </div>
+
+    <!-- Show Header only if exclude_header_footer is False -->
+  
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+   
+
+    <!-- Show Footer only if exclude_header_footer is False -->
+    {% if not exclude_header_footer %}
+        <footer class="footer">
+            <p>&copy; 2025 Road Complaint Portal. All Rights Reserved.</p>
+        </footer>
+    {% endif %}
+
+<script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>
