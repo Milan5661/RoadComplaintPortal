@@ -125,3 +125,72 @@ body {
 .new-complaint .btn {
     display: inline-block; /* Ensure the button behaves like an inline element */
 }
+
+/*steps section*/
+.steps-section {
+    padding: 3rem 0;
+    background-color: #f9f9f9;
+}
+
+.steps-section h2 {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.steps-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    position: relative;
+}
+
+.steps-container::before {
+    content: '';
+    position: absolute;
+    left: calc(2rem + 20px);
+    top: 0;
+    height: 100%;
+    width: 2px;
+    background: #007bff;
+}
+
+.step {
+    background: white;
+    padding: 2rem 2rem 2rem 4rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: relative;
+    margin-bottom: 2rem;
+    margin-left: 3rem;
+}
+
+.step:last-child {
+    margin-bottom: 0;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    background: #007bff;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    position: absolute;
+    left: -3rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+}
+
+.step h3 {
+    margin: 0 0 0.5rem 0;
+    color: #007bff;
+}
+
+.step p {
+    margin: 0;
+    color: #666;
+}
