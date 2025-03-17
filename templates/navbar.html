@@ -5,30 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Road Complaint Portal</title>
     <style>
-        /* Internal CSS for Navbar */
+        /* Navbar Styling */
         .navbar {
-            background: linear-gradient(to right, #1E293B, #4F46E5); /* Dark to Blue Gradient */
-            padding: 15px 30px;
+            background: linear-gradient(to right, #1E293B, #4F46E5); /* Gradient background */
+            padding: 15px 20px;
             display: flex;
-            justify-content: space-between;
+            justify-content: space-between; /* Align items at the edges */
             align-items: center;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 0; /* Removed curved borders */
+            position: fixed; /* Fixed navbar at the top */
+            top: 0;
+            left: 0;
+            z-index: 1000; /* Ensure navbar is above other elements */
         }
+
+        /* Logo and Branding */
         .navbar-brand {
             font-size: 24px;
             font-weight: bold;
             color: white;
             text-decoration: none;
-            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Adds spacing between icon and text */
         }
-        .navbar-brand:hover {
-            color: #FFD700; /* Gold Hover */
-        }
+
+        /* Navbar Menu Styling */
         .navbar-menu {
             display: flex;
             gap: 20px;
         }
+
         .navbar-menu a {
             color: white;
             text-decoration: none;
@@ -37,30 +47,84 @@
             border-radius: 6px;
             transition: 0.3s ease-in-out;
         }
+
         .navbar-menu a:hover {
-            background: #FFD700; /* Gold Background */
+            background: #4F46E5; /* Highlight on hover */
             color: black;
             transform: scale(1.1);
         }
+
+        /* Logout Button Styling */
         .logout-btn {
-            margin-left: 30px;
-            padding: 8px 15px;
-            background: #DC2626; /* Red */
+            background: #DC2626;
             color: white;
             font-weight: bold;
+            padding: 8px 15px;
             border-radius: 6px;
-            transition: 0.3s ease-in-out;
         }
-        .logout-btn:hover {
-            background: #FF4C4C; /* Lighter Red */
-            transform: scale(1.1);
+
+        /* Hamburger Menu Button */
+        .menu-toggle {
+            font-size: 24px;
+            color: white;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: none; /* Initially hidden */
+            align-items: center;
+        }
+
+        /* Responsive Design for Mobile Screens */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px;
+            }
+
+            /* Hide the default menu and display it in a dropdown */
+            .navbar-menu {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                background: #1E293B;
+                padding: 15px;
+                box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+                z-index: 1000;
+            }
+
+            /* Ensure menu items take full width */
+            .navbar-menu a {
+                display: block;
+                text-align: center;
+                padding: 10px 0;
+            }
+
+            /* Show hamburger menu button */
+            .menu-toggle {
+                display: flex;
+            }
+
+            /* Show menu when toggled */
+            .navbar-menu.show {
+                display: flex;
+            }
         }
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <a href="{% url 'home' %}" class="navbar-brand">🚧 Road Complaint Portal</a>
-        <div class="navbar-menu">
+        <!-- Logo and Branding -->
+        <a href="{% url 'home' %}" class="navbar-brand">
+            🚧 Road Complaint Portal
+        </a>
+
+        <!-- Hamburger Menu Button -->
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+
+        <!-- Navbar Links -->
+        <div class="navbar-menu" id="navMenu">
             <a href="{% url 'home' %}">Home</a>
             <a href="{% url 'complaints_list' %}">View Complaints</a>
             <a href="{% url 'submit_complaint' %}">Report Complaint</a>
@@ -73,5 +137,12 @@
             {% endif %}
         </div>
     </nav>
+
+    <script>
+        // Function to toggle the mobile menu
+        function toggleMenu() {
+            document.getElementById("navMenu").classList.toggle("show");
+        }
+    </script>
 </body>
 </html>

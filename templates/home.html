@@ -1,15 +1,13 @@
 {% extends 'base.html' %}
 {% load static %}
-
 {% block content %}
-
 <!-- Hero Section -->
 <header class="hero">
     <div class="overlay"></div>
     <div class="hero-content">
         <h1>Welcome to Road Complaint Portal</h1>
         <p>Report road issues easily and help improve your community.</p>
-        <a href="{% url 'submit_complaint' %}" class="btn btn-primary">Report a Complaint</a>
+        
     </div>
 </header>
 
@@ -56,6 +54,7 @@
                 <h3>Submit Report</h3>
                 <p>Submit your report and track its progress</p>
             </div>
+            <a href="{% url 'submit_complaint' %}" class="btn btn-primary">Report a Complaint</a>
         </div>
     </div>
 </section>
