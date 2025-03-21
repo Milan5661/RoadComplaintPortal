@@ -3,34 +3,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Road Complaint Portal{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
-    {% include 'navbar.html' %}  <!-- Include Navbar Here -->
-    <script src="{% static 'js/script.js' %}"></script>
-    <div class="milan">
-        {% block milan %}
-        {% endblock %}
-    </div>
+    {% include 'navbar.html' %}  
 
-    <!-- Show Header only if exclude_header_footer is False -->
-  
+    <div class="page-wrapper">
+        <main>
+            {% block content %}{% endblock %}
+        </main>
 
-    <main>
-        {% block content %}{% endblock %}
-    </main>
-
-   
-
-    <!-- Show Footer only if exclude_header_footer is False -->
-    {% if not exclude_header_footer %}
         <footer class="footer">
             <p>&copy; 2025 Road Complaint Portal. All Rights Reserved.</p>
         </footer>
-    {% endif %}
+    </div>
 
-<script src="{% static 'js/script.js' %}"></script>
+    <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>

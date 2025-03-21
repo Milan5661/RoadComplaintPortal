@@ -3,7 +3,6 @@
 {% block content %}
 <!-- Hero Section -->
 <header class="hero">
-    <div class="overlay"></div>
     <div class="hero-content">
         <h1>Welcome to Road Complaint Portal</h1>
         <p>Report road issues easily and help improve your community.</p>
@@ -14,23 +13,24 @@
 <!-- Features Section -->
 <section class="features">
     <div class="feature">
-        <i class="icon bi bi-pencil-square"></i>
+        <i class="fas fa-file-alt fa-2x" style="color: #3f51b5; margin-bottom: 1rem;"></i>
         <h3>Easy Reporting</h3>
         <p>Submit complaints with images and location details.</p>
     </div>
     <div class="feature">
-        <i class="icon bi bi-map"></i>
+        <i class="fas fa-map-marked-alt fa-2x" style="color: #3f51b5; margin-bottom: 1rem;"></i>
         <h3>Interactive Map</h3>
         <p>View and track complaints on a real-time map.</p>
     </div>
     <div class="feature">
-        <i class="icon bi bi-check-circle"></i>
+        <i class="fas fa-chart-line fa-2x" style="color: #3f51b5; margin-bottom: 1rem;"></i>
         <h3>Track Progress</h3>
         <p>Get updates on the status of your complaints.</p>
     </div>
 </section>
 
-<section>
+<!--step section-->
+<main>
     <div class="steps-section">
         <h2>How to Report an Issue</h2>
         <div class="steps-container">
@@ -54,10 +54,10 @@
                 <h3>Submit Report</h3>
                 <p>Submit your report and track its progress</p>
             </div>
-            <a href="{% url 'submit_complaint' %}" class="btn btn-primary">Report a Complaint</a>
         </div>
+        <a href="{% url 'submit_complaint' %}" class="btn btn-primary report-complaint-btn">Report a Complaint</a>
     </div>
-</section>
+</main>
 
 <!-- Contact Section -->
 <section class="contact">

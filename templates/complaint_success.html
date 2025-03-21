@@ -1,13 +1,22 @@
 {% extends 'base.html' %}
-
 {% block title %}Complaint Submitted - Road Complaint Portal{% endblock %}
 
 {% block content %}
-<section class="success-section">
-    <div class="container">
-        <h2>Complaint Submitted Successfully!</h2>
-        <p>Your complaint has been received. Your complaint ID is <strong>#{{ complaint_id }}</strong>.</p>
-        <a href="{% url 'home' %}" class="btn">Back to Home</a>
+<div class="complaint-container">
+    <div class="complaint-card" style="text-align: center;">
+        <div style="margin: 2rem 0;">
+            <i class="fas fa-check-circle" style="font-size: 4rem; color: #28a745; margin-bottom: 1.5rem;"></i>
+            <h2 class="complaint-title">Complaint Submitted Successfully!</h2>
+            <p style="font-size: 1.1rem; color: #666; margin-bottom: 1.5rem;">
+                Your complaint has been received.<br>
+                Your complaint ID is <strong style="color: #333; font-size: 1.2rem;">#{{ complaint_id }}</strong>
+            </p>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="{% url 'view_complaints' %}" class="submit-btn" style="max-width: 200px; text-decoration: none;">View My Complaints</a>
+            <a href="{% url 'home' %}" class="location-btn" style="max-width: 200px; text-decoration: none;">Back to Home</a>
+        </div>
     </div>
-</section>
+</div>
 {% endblock %}

@@ -2,43 +2,50 @@
 {% block title %}Submit Complaint - Road Complaint Portal{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h3 class="text-center mb-4">Submit a Road Complaint</h3>
-    <form id="complaintForm" method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
+<div class="complaint-container">
+    <div class="complaint-card">
+        <h2 class="complaint-title">Submit a Road Complaint</h2>
         
-        <div class="mb-3">
-            <label for="description" class="form-label">Complaint Description</label>
-            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
-        </div>
-        
-        <div class="mb-3">
-            <label for="address" class="form-label">Address</label>
-            <input type="text" class="form-control" id="address" name="address" placeholder="Enter the address of the complaint" required>
-        </div>
+        <form id="complaintForm" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-section">
+                <label for="description">Complaint Description</label>
+                <textarea id="description" name="description" placeholder="Please describe the road issue in detail..." required></textarea>
+            </div>
+            
+            <div class="form-section">
+                <label for="address">Location Address</label>
+                <input type="text" id="address" name="address" placeholder="Enter the address of the complaint" required>
+            </div>
 
-        <div class="mb-3">
-            <button type="button" class="btn btn-secondary" id="getLocationBtn">Use My Current Location</button>
-        </div>
-        
-        <div class="mb-3">
-            <label for="latitude" class="form-label">Latitude</label>
-            <input type="text" class="form-control" id="latitude" name="latitude" readonly>
-        </div>
-        
-        <div class="mb-3">
-            <label for="longitude" class="form-label">Longitude</label>
-            <input type="text" class="form-control" id="longitude" name="longitude" readonly>
-        </div>
-        
-        <!-- Image Upload Feature -->
-        <div class="mb-3">
-            <label for="image" class="form-label">Upload Image</label>
-            <input type="file" class="form-control" id="image" name="image">
-        </div>
-        
-        <button type="submit" class="btn btn-primary w-100">Submit Complaint</button>
-    </form>
+            <div class="location-section">
+                <button type="button" class="location-btn" id="getLocationBtn">
+                    <i class="fas fa-map-marker-alt"></i> Use My Current Location
+                </button>
+                
+                <div class="form-section">
+                    <label for="latitude">Latitude</label>
+                    <input type="text" id="latitude" name="latitude" readonly>
+                </div>
+                
+                <div class="form-section">
+                    <label for="longitude">Longitude</label>
+                    <input type="text" id="longitude" name="longitude" readonly>
+                </div>
+            </div>
+            
+            <div class="file-upload">
+                <label for="image">
+                    <i class="fas fa-camera"></i> Upload Image
+                    <p class="text-muted">(Optional) Add a photo of the issue</p>
+                </label>
+                <input type="file" id="image" name="image" accept="image/*">
+            </div>
+            
+            <button type="submit" class="submit-btn">Submit Complaint</button>
+        </form>
+    </div>
 </div>
 
 <script>
@@ -47,26 +54,11 @@
             navigator.geolocation.getCurrentPosition(function(position) {
                 document.getElementById('latitude').value = position.coords.latitude;
                 document.getElementById('longitude').value = position.coords.longitude;
-
-                // Optionally, reverse geocode the latitude/longitude to address
-                // You can use Google Maps API for reverse geocoding (if needed)
-                var lat = position.coords.latitude;
-                var lon = position.coords.longitude;
-                var geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=AIzaSyDsY9kHKIPb2WIaw5IwOugiYydc4YWw6Pk`;
-
-                fetch(geocodeUrl)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.results.length > 0) {
-                            document.getElementById('address').value = data.results[0].formatted_address;
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching address:', error);
-                    });
+            }, function(error) {
+                alert('Error getting location: ' + error.message);
             });
         } else {
-            alert("Geolocation is not supported by this browser.");
+            alert('Geolocation is not supported by this browser.');
         }
     });
 </script>

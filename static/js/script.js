@@ -43,4 +43,60 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+
+    // Handle footer visibility
+    const footer = document.querySelector('.footer');
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    function updateFooterVisibility() {
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        const scrolledToBottom = (window.scrollY + windowHeight) >= (documentHeight - 10);
+
+        if (scrolledToBottom) {
+            footer.classList.add('visible');
+        } else {
+            footer.classList.remove('visible');
+        }
+        
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', function() {
+        lastScrollY = window.scrollY;
+        if (!ticking) {
+            window.requestAnimationFrame(function() {
+                updateFooterVisibility();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+
+    // Initial check
+    updateFooterVisibility();
+
+    // Get user's location
+    const getLocationBtn = document.getElementById('getLocationBtn');
+    if (getLocationBtn) {
+        getLocationBtn.addEventListener('click', function() {
+            if (navigator.geolocation) {
+                getLocationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting Location...';
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    document.getElementById('latitude').value = position.coords.latitude;
+                    document.getElementById('longitude').value = position.coords.longitude;
+                    getLocationBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> Location Updated';
+                    getLocationBtn.classList.add('success');
+                }, function(error) {
+                    getLocationBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Location Error';
+                    getLocationBtn.classList.add('error');
+                    console.error('Error getting location:', error);
+                });
+            } else {
+                getLocationBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Not Supported';
+                getLocationBtn.classList.add('error');
+            }
+        });
+    }
 });
