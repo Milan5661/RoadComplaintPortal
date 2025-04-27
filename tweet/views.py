@@ -9,7 +9,7 @@ from .forms import ComplaintForm
 from django.contrib import messages
 from django.http import JsonResponse
 
-# 🌍 Home Page
+# Home Page
 def index(request):
     return render(request, 'base.html')
 
@@ -58,7 +58,7 @@ def submit_complaint(request):
 
     return render(request, "complaint_form.html")
 
-# 🔍 View Complaints
+# View Complaints
 def complaints_list(request):
     complaints = Complaint.objects.all().order_by('-date_reported')
     return render(request, "complaints_list.html", {"complaints": complaints})
@@ -91,25 +91,21 @@ def logout_view(request):
     logout(request)
     return redirect('home')
 
-# Dashboard for Users
-@login_required
-def dashboard(request):
-    user_complaints = Complaint.objects.filter(user=request.user)
-    
-    total_complaints = user_complaints.count()
-    resolved_complaints = user_complaints.filter(status="Resolved").count()
-    pending_complaints = user_complaints.filter(status="Pending").count()
-
-    complaints = {
-        "complaints": user_complaints,
-        "total_complaints": total_complaints,
-        "resolved_complaints": resolved_complaints,
-        "pending_complaints": pending_complaints,
-    }
-    return render(request, "dashboard.html", {'complaints': complaints})
-
 def home(request):
-    return render(request, "home.html")
+    # Get complaint statistics for the counters
+    total_complaints = Complaint.objects.count()
+    pending_complaints = Complaint.objects.filter(status="Pending").count()
+    in_progress_complaints = Complaint.objects.filter(status="In Progress").count()
+    resolved_complaints = Complaint.objects.filter(status="Resolved").count()
+    
+    context = {
+        "total_complaints": total_complaints,
+        "pending_complaints": pending_complaints,
+        "in_progress_complaints": in_progress_complaints,
+        "resolved_complaints": resolved_complaints
+    }
+    
+    return render(request, "home.html", context)
 
 def get_complaints(request):
     complaints = list(Complaint.objects.values("latitude", "longitude", "description"))
@@ -118,8 +114,6 @@ def get_complaints(request):
 class ComplaintListCreateView(generics.ListCreateAPIView):
     queryset = Complaint.objects.all().order_by('-date_reported')
     serializer_class = ComplaintSerializer
-from django.shortcuts import render
-
 
 # Hide header/footer for login, register, and logout pages
 def login_view(request):
