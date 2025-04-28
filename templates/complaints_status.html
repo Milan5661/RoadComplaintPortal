@@ -1,0 +1,17 @@
+<h2>Your Complaints</h2>
+{% if complaints %}
+    <ul>
+        {% for complaint in complaints %}
+            <li>
+                <strong>{{ complaint.title }}</strong> - 
+                {% if complaint.is_approved %}
+                    Approved
+                {% else %}
+                    Pending Approval
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>You have not submitted any complaints yet.</p>
+{% endif %}

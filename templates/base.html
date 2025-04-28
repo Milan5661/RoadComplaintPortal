@@ -8,15 +8,15 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     {% include 'navbar.html' %}  
 
     <div class="page-wrapper">
-        <main>
+        <main class="flex-fill">
             {% block content %}{% endblock %}
         </main>
 
-        <footer class="footer">
+        <footer class="class="bg-dark text-white text-center py-3 mt-auto"">
             <br>
             <p align="center">&copy; 2025 Road Complaint Portal. All Rights Reserved.</p>
             <br>

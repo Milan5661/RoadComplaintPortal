@@ -126,10 +126,16 @@
         <!-- Navbar Links -->
         <div class="navbar-menu" id="navMenu">
             <a href="{% url 'home' %}">Home</a>
-            <a href="{% url 'complaints_list' %}">View Complaints</a>
-            <a href="{% url 'submit_complaint' %}">Report Complaint</a>
-            <a href="{% url 'dashboard' %}">Dashboard</a>
+            
+            {% if user.is_authenticated %}
+                <a href="{% url 'tweet:my_complaints' %}">My Complaints</a>
+                
+            {% endif %}
+                <a href="{% url 'submit_complaint' %}">Report Complaint</a>
+                <a href="{% url 'dashboard' %}">Dashboard</a>
 
+            
+            
             {% if user.is_authenticated %}
                 <a class="logout-btn" href="{% url 'logout' %}">Logout</a>
             {% else %}

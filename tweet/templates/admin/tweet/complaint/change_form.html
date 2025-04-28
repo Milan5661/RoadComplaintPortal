@@ -1,0 +1,24 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block after_field_sets %}
+    {{ block.super }}
+    {% if original.latitude and original.longitude %}
+        <h3>Location Map</h3>
+        <div id="admin-map" style="height: 300px;"></div>
+        <!-- Leaflet CSS and JS -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function() {
+                var lat = {{ original.latitude|floatformat:6 }};
+                var lng = {{ original.longitude|floatformat:6 }};
+                var map = L.map('admin-map').setView([lat, lng], 15);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19
+                }).addTo(map);
+                L.marker([lat, lng]).addTo(map);
+            });
+        </script>
+    {% endif %}
+{% endblock %}

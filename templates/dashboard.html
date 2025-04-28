@@ -1,81 +1,73 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="dashboard-container">
-    <h2 class="dashboard-title">User Dashboard</h2>
+<div class="container py-5">
+    <h1 class="text-center mb-5" style="font-weight: bold; font-size: 2.5rem;">Road Complaint Dashboard</h1>
     
-    <!-- Complaint Statistics -->
-    <div class="stats">
-        <div class="stat-card">
-            <h3>Total Complaints</h3>
-            <p>{{ total_complaints }}</p>
+    <div class="row d-flex justify-content-between">
+        <!-- Left Card: Total Complaints -->
+        <div class="col-md-3">
+            <div class="card text-center shadow p-4 rounded-4 border-0 bg-light h-100">
+                <div class="card-body">
+                    <i class="fas fa-list fa-3x mb-3 text-primary"></i>
+                    <h2 id="totalComplaints" class="counter mb-2" style="font-size: 2.5rem;">0</h2>
+                    <p class="mb-0" style="font-weight: bold;">Total Complaints</p>
+                </div>
+            </div>
         </div>
-        <div class="stat-card">
-            <h3>Resolved Complaints</h3>
-            <p>{{ resolved_complaints }}</p>
-        </div>
-        <div class="stat-card">
-            <h3>Pending Complaints</h3>
-            <p>{{ pending_complaints }}</p>
-        </div>
-    </div>
 
-    <!-- Complaints List -->
-    <div class="complaints-list">
-        
-        <table>
-            <thead>
-                <tr>
-                    <th>Complaint</th>
-                    <th>Status</th>
-                    <th>Submitted On</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for complaint in complaints %}
-                <tr>
-                    <td>{{ complaint.description }}</td>
-                    <td>
-                        {% if complaint.status == "Resolved" %}
-                            <span class="status resolved">Resolved</span>
-                        {% else %}
-                            <span class="status pending">Pending</span>
-                        {% endif %}
-                    </td>
-                    <td>{{ complaint.date_reported }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="dashboard-container">
-        <h2>Complaint Dashboard</h2>
-        
-     <!-- Submit Complaint Button -->
-     <div class="new-complaint">
-        <a href="{% url 'submit_complaint' %}" class="btn">Submit a New Complaint</a>
+        <!-- Center Card: Pending Complaints -->
+        <div class="col-md-3">
+            <div class="card text-center shadow p-4 rounded-4 border-0 bg-light h-100">
+                <div class="card-body">
+                    <i class="fas fa-hourglass-half fa-3x mb-3 text-warning"></i>
+                    <h2 id="pendingComplaints" class="counter mb-2" style="font-size: 2.5rem;">0</h2>
+                    <p class="mb-0" style="font-weight: bold;">Pending Complaints</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Card: Resolved Complaints -->
+        <div class="col-md-3">
+            <div class="card text-center shadow p-4 rounded-4 border-0 bg-light h-100">
+                <div class="card-body">
+                    <i class="fas fa-check-circle fa-3x mb-3 text-success"></i>
+                    <h2 id="resolvedComplaints" class="counter mb-2" style="font-size: 2.5rem;">0</h2>
+                    <p class="mb-0" style="font-weight: bold;">Resolved Complaints</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-    
-    <script>
-        function initMap() {
-            var map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: 0, lng: 0 },
-                zoom: 2
-            });
-    
-            {% for complaint in complaints %}
-                var complaintLocation = { lat: {{ complaint.latitude }}, lng: {{ complaint.longitude }} };
-                var marker = new google.maps.Marker({
-                    position: complaintLocation,
-                    map: map,
-                    title: '{{ complaint.description }}'
-                });
-            {% endfor %}
-        }
-    </script>
 
-   
+<!-- Counter Animation -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function animateCounter(id, end) {
+        let start = 0;
+        let duration = 1500;
+        let increment = end / (duration / 40);
+        let obj = document.getElementById(id);
+        
+        let timer = setInterval(function() {
+            start += increment;
+            if (start >= end) {
+                start = end;
+                clearInterval(timer);
+            }
+            obj.innerText = Math.floor(start);
+        }, 40);
+    }
+
+    animateCounter('totalComplaints', {{ total_complaints }});
+    animateCounter('resolvedComplaints', {{ resolved_complaints }});
+    animateCounter('pendingComplaints', {{ pending_complaints }});
+});
+</script>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
 {% endblock %}

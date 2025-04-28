@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .card-hover:hover {
+        transform: translateY(-8px);
+        transition: 0.3s;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+<div class="container my-5">
+    <h2 class="mb-4 text-center">My Complaints</h2>
+    
+    {% if complaints %}
+    <div class="row g-4">
+        {% for complaint in complaints %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm card-hover">   <!-- added card-hover -->
+                {% if complaint.image %}
+                <img src="{{ complaint.image.url }}" class="card-img-top" alt="Complaint Image">
+                {% else %}
+                <img src="{% static 'images/default-complaint.jpg' %}" class="card-img-top" alt="No Image">
+                {% endif %}
+                
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ complaint.title }}</h5>
+                    <p class="card-text">{{ complaint.description|truncatechars:100 }}</p>
+
+                    <div class="mt-auto">
+                        {% if complaint.status == 'Pending' %}
+                        <span class="badge bg-warning text-dark">Pending</span>
+                        {% elif complaint.status == 'Approved' %}
+                        <span class="badge bg-success">Approved</span>
+                        {% elif complaint.status == 'Rejected' %}
+                        <span class="badge bg-danger">Rejected</span>
+                        {% endif %}
+                        <p class="text-muted small mt-2 mb-0">Submitted: {{ complaint.created_at|date:"M d, Y" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center" role="alert">
+        You have not submitted any complaints yet.
+    </div>
+    {% endif %}
+</div>
+<!-- Pagination -->
+<div class="d-flex justify-content-center mt-4">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if complaints.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ complaints.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo; Previous</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&laquo; Previous</span>
+            </li>
+            {% endif %}
+
+            <li class="page-item disabled">
+                <span class="page-link">Page {{ complaints.number }} of {{ complaints.paginator.num_pages }}</span>
+            </li>
+
+            {% if complaints.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ complaints.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">Next &raquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">Next &raquo;</span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+
+{% endblock %}

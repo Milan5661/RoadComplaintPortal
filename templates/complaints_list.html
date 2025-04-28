@@ -17,6 +17,10 @@
                 {% else %}
                 <div class="complaint-image"></div>
                 {% endif %}
+                <div class="complaint-status">
+                    <strong>Status:</strong> {{ complaint.status }}
+                </div>
+                {% endif %}
                 
                 <div class="complaint-content">
                     <div class="complaint-meta">

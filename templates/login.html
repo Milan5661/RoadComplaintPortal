@@ -20,6 +20,9 @@
             <button type="submit" class="btn btn-primary w-100">Login</button>
         </form>
         <p class="mt-3 text-center">
+            <a href="{% url 'admin_password_reset' %}">Forgot Password?</a>
+        </p>
+        <p class="mt-3 text-center">
             Don't have an account? <a href="{% url 'register' %}">Register here</a>
         </p>
     </div>

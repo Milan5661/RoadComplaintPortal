@@ -8,7 +8,7 @@
         <h2>Recent Complaints</h2>
         <ul class="complaint-list">
             {% for complaint in complaints %}
-            <li>
+            <li style="min-width: 300px; flex: 0 0 auto;">
                 <h3>Complaint #{{ complaint.id }}</h3>
                 <p><strong>Description:</strong> {{ complaint.description }}</p>
                 <p><strong>Location:</strong> {{ complaint.location }}</p>
@@ -17,6 +17,9 @@
                 {% endif %}
                 <p><strong>Date Reported:</strong> {{ complaint.date_reported }}</p>
                 <p><strong>Status:</strong> {{ complaint.status }}</p>
+                <div class="complaint-status">
+                    <strong>Status:</strong> {{ complaint.status }}
+                </div>
             </li>
             {% empty %}
             <p>No complaints found.</p>
