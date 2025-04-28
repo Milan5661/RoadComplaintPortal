@@ -68,11 +68,64 @@ def admin_password_reset(request):
 def home(request):
     return render(request, "home.html")
 
+<<<<<<< HEAD
+=======
+# Home Page
+>>>>>>> f599c6034d52f10e6f476523bdca757424f8e4a4
 def index(request):
     return render(request, 'base.html')
 
 # ----------------- User Authentication -----------------
 
+<<<<<<< HEAD
+=======
+    if request.method == "POST":
+        form = ComplaintForm(request.POST, request.FILES)
+        if form.is_valid():
+            complaint = form.save(commit=False)
+            complaint.user = request.user
+            complaint.save()
+            messages.success(request, "Complaint submitted successfully!")
+            return redirect("tweet:complaints-list")
+        else:
+            messages.error(request, "Error submitting complaint. Please try again.")
+
+    return render(request, "complaint_form.html", {"form": form})
+
+#Submit Complaint with Geolocation
+@login_required
+def submit_complaint(request):
+    if request.method == "POST":
+        description = request.POST.get("description")
+        image = request.FILES.get("image")
+        address=request.FILES.get("address")
+        latitude = request.POST.get("latitude")
+        longitude = request.POST.get("longitude")
+
+        if not description or not image:
+            return render(request, "complaint_form.html", {"error": "All fields are required."})
+
+        # Save complaint with location data
+        complaint = Complaint(
+            user=request.user,
+            description=description,
+            image=image,
+            address=address,
+            latitude=latitude,
+            longitude=longitude
+        )
+        complaint.save()
+        return redirect("tweet:complaints-list")
+
+    return render(request, "complaint_form.html")
+
+# View Complaints
+def complaints_list(request):
+    complaints = Complaint.objects.all().order_by('-date_reported')
+    return render(request, "complaints_list.html", {"complaints": complaints})
+
+# User Authentication Views
+>>>>>>> f599c6034d52f10e6f476523bdca757424f8e4a4
 def register_view(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
@@ -100,6 +153,7 @@ def logout_view(request):
     logout(request)
     return redirect('home')
 
+<<<<<<< HEAD
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
@@ -185,11 +239,29 @@ class ComplaintListCreateView(generics.ListCreateAPIView):
     serializer_class = ComplaintSerializer
 
 # ----------------- Maps Data -----------------
+=======
+def home(request):
+    # Get complaint statistics for the counters
+    total_complaints = Complaint.objects.count()
+    pending_complaints = Complaint.objects.filter(status="Pending").count()
+    in_progress_complaints = Complaint.objects.filter(status="In Progress").count()
+    resolved_complaints = Complaint.objects.filter(status="Resolved").count()
+    
+    context = {
+        "total_complaints": total_complaints,
+        "pending_complaints": pending_complaints,
+        "in_progress_complaints": in_progress_complaints,
+        "resolved_complaints": resolved_complaints
+    }
+    
+    return render(request, "home.html", context)
+>>>>>>> f599c6034d52f10e6f476523bdca757424f8e4a4
 
 def get_complaints(request):
     complaints = list(Complaint.objects.values("latitude", "longitude", "description"))
     return JsonResponse(complaints, safe=False)
 
+<<<<<<< HEAD
 def dashboard(request):
     total_complaints = Complaint.objects.count()
     resolved_complaints = Complaint.objects.filter(status='Resolved').count()
@@ -201,3 +273,18 @@ def dashboard(request):
         'pending_complaints': pending_complaints,
     }
     return render(request, 'dashboard.html', context)
+=======
+class ComplaintListCreateView(generics.ListCreateAPIView):
+    queryset = Complaint.objects.all().order_by('-date_reported')
+    serializer_class = ComplaintSerializer
+
+# Hide header/footer for login, register, and logout pages
+def login_view(request):
+    return render(request, 'login.html', {'exclude_header_footer': True})
+
+def register_view(request):
+    return render(request, 'register.html', {'exclude_header_footer': True})
+
+def logout_view(request):
+    return render(request, 'logout.html', {'exclude_header_footer': True})
+>>>>>>> f599c6034d52f10e6f476523bdca757424f8e4a4
