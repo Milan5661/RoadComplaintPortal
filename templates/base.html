@@ -5,24 +5,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Road Complaint Portal{% endblock %}</title>
+    
+    <!-- Link to custom CSS -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <!-- Google Fonts for typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Animate.css for page animations -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
 </head>
-<body class="d-flex flex-column min-vh-100">
+<body class="d-flex flex-column min-vh-100" style="font-family: 'Roboto', sans-serif;">
     {% include 'navbar.html' %}  
 
     <div class="page-wrapper">
-        <main class="flex-fill">
+        <main class="flex-fill animate__animated animate__fadeIn">
             {% block content %}{% endblock %}
         </main>
 
-        <footer class="class="bg-dark text-white text-center py-3 mt-auto"">
+        <footer class="bg-dark text-white text-center py-3 mt-auto animate__animated animate__fadeInUp">
             <br>
             <p align="center">&copy; 2025 Road Complaint Portal. All Rights Reserved.</p>
             <br>
         </footer>
     </div>
 
+    <!-- Custom JavaScript -->
     <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>

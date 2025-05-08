@@ -1,0 +1,11 @@
+{% extends "admin/change_list.html" %}
+{% block object-tools %}
+    {% if show_report_generation_button and report_generation_url %}
+        <li>
+            <a href="{{ report_generation_url }}" class="btn btn-info" style="margin-right: 10px; color: white;">
+                <strong>Report Generation</strong>
+            </a>
+        </li>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}

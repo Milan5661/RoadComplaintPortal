@@ -1,17 +1,141 @@
-<!-- {% extends 'base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}Home - Road Complaint Portal{% endblock %}
 
 {% block content %}
-<section class="hero">
-    <div class="container">
-        <h1>Welcome to the Road Complaint Portal</h1>
-        <p>Report road issues in your area and help make roads safer.</p>
+<section class="hero-section">
+    <div class="hero-content glass">
+        <div class="hero-icon">
+            <svg width="68" height="68" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="34" cy="34" r="32" fill="#fff3" stroke="#ffb347" stroke-width="4"/><path d="M20 40l8-10 8 6 12-16" stroke="#38e8ad" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h1>Make Roads Safer, Together.</h1>
+        <p class="hero-desc">Spot a pothole, broken streetlight, or any road hazard? Report it instantly and join a community making roads better for everyone!</p>
         {% if user.is_authenticated %}
-            <a href="{% url 'submit_complaint' %}" class="btn">Submit a Complaint</a>
+            <a href="{% url 'submit_complaint' %}" class="btn-glow">Submit a Complaint</a>
         {% else %}
-            <a href="{% url 'register' %}" class="btn">Get Started</a>
+            <a href="{% url 'register' %}" class="btn-glow">Get Started</a>
         {% endif %}
+        <div class="hero-stats">
+            <div class="stat-card glass">
+                <span class="counter" id="complaintsCount">5,200+</span>
+                <span>Complaints Resolved</span>
+            </div>
+            <div class="stat-card glass">
+                <span class="counter" id="usersCount">1,300+</span>
+                <span>Active Users</span>
+            </div>
+            <div class="stat-card glass">
+                <span class="counter" id="citiesCount">22</span>
+                <span>Cities Covered</span>
+            </div>
+        </div>
     </div>
+    <canvas id="particle-bg"></canvas>
+    <div class="animated-bg"></div>
+    <div class="hero-bg-img" style="background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80'); position: absolute; inset: 0; z-index: 1;"></div>
 </section>
-{% endblock %} !>?
+<!-- Rotating hero background images -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const heroImages = [
+        'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1200&q=80'
+    ];
+    let heroIdx = 0;
+    function rotateHeroBg() {
+        const bgDiv = document.querySelector('.hero-bg-img');
+        if (bgDiv) {
+            bgDiv.style.backgroundImage = `url('${heroImages[heroIdx]}')`;
+        }
+        heroIdx = (heroIdx + 1) % heroImages.length;
+    }
+    rotateHeroBg();
+    setInterval(rotateHeroBg, 4000);
+});
+</script>
+<script>
+// Parallax Particle Background
+const canvas = document.getElementById('particle-bg');
+const ctx = canvas.getContext('2d');
+let particles = [], w, h, mouse = {x:0, y:0};
+const colors = ['#38e8ad', '#ffb347', '#2a5298', '#fff3'];
+function resize() {
+    w = window.innerWidth; h = window.innerHeight;
+    canvas.width = w; canvas.height = h;
+}
+window.addEventListener('resize', resize);
+canvas.style.position = 'absolute';
+canvas.style.top = 0;
+canvas.style.left = 0;
+canvas.style.width = '100%';
+canvas.style.height = '100%';
+canvas.style.zIndex = 0;
+canvas.style.pointerEvents = 'none';
+resize();
+function Particle() {
+    this.x = Math.random() * w;
+    this.y = Math.random() * h;
+    this.r = 1.7 + Math.random() * 2.7;
+    this.c = colors[Math.floor(Math.random()*colors.length)];
+    this.dx = (Math.random() - 0.5) * 0.6;
+    this.dy = (Math.random() - 0.5) * 0.6;
+}
+Particle.prototype.draw = function() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
+    ctx.fillStyle = this.c;
+    ctx.globalAlpha = 0.55;
+    ctx.shadowColor = this.c;
+    ctx.shadowBlur = 8;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+};
+Particle.prototype.update = function() {
+    this.x += this.dx + (mouse.x - w/2)/w * 1.5;
+    this.y += this.dy + (mouse.y - h/2)/h * 1.5;
+    if(this.x < 0 || this.x > w) this.dx *= -1;
+    if(this.y < 0 || this.y > h) this.dy *= -1;
+};
+function createParticles(n) {
+    particles = [];
+    for(let i=0;i<n;i++) particles.push(new Particle());
+}
+createParticles(Math.floor(w/18));
+window.addEventListener('mousemove', e => {
+    mouse.x = e.clientX; mouse.y = e.clientY;
+});
+function animateParticles() {
+    ctx.clearRect(0,0,w,h);
+    for(let p of particles) {
+        p.update();
+        p.draw();
+    }
+    requestAnimationFrame(animateParticles);
+}
+animateParticles();
+window.addEventListener('resize', ()=>{
+    createParticles(Math.floor(window.innerWidth/18));
+});
+
+// Animate numbers for counters
+function animateCounter(id, target) {
+    let el = document.getElementById(id);
+    let count = 0;
+    let inc = Math.ceil(target / 60);
+    let interval = setInterval(() => {
+        count += inc;
+        if (count >= target) {
+            count = target;
+            clearInterval(interval);
+        }
+        el.innerText = count.toLocaleString();
+    }, 18);
+}
+animateCounter('complaintsCount', 5200);
+animateCounter('usersCount', 1300);
+animateCounter('citiesCount', 22);
+</script>
+{% endblock %}
+

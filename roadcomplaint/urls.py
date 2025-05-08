@@ -2,13 +2,14 @@ from django.contrib import admin
 from django.urls import path, include
 from accounts import views as accounts_views
 from tweet import views as tweet_views
-from tweet.views import dashboard
+
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls')), 
+    # path('accounts/', include('django.contrib.auth.urls')),  # Disabled default auth URLs to use custom password reset flow
+
 
     # Home page
     path('', tweet_views.home, name='home'),
@@ -22,7 +23,6 @@ urlpatterns = [
     path('register/', accounts_views.register, name='register'),
     path('login/', accounts_views.login_view, name='login'),
     path('logout/', accounts_views.logout_view, name='logout'),
-    path('dashboard/', dashboard, name='dashboard'),
 
     # Complaint-related
     path('submit-complaint/', tweet_views.complaint_form, name='submit_complaint'),
@@ -31,6 +31,10 @@ urlpatterns = [
 
     # Tweet app
     path('tweet/', include(('tweet.urls', 'tweet'), namespace='tweet')),
+
+    # Direct password reset route for accounts
+    path('accounts/password_reset/', tweet_views.password_reset, name='accounts_password_reset'),
+    path('accounts/', include('accounts.urls')),
 ]
 
 if settings.DEBUG:

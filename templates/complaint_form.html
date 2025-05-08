@@ -23,6 +23,21 @@
                 <button type="button" class="location-btn" id="getLocationBtn">
                     <i class="fas fa-map-marker-alt"></i> Use My Current Location
                 </button>
+                <small class="text-muted d-block mt-2">You will be asked to allow location access by your browser. Please accept for best accuracy.</small>
+                <script>
+                    document.getElementById('getLocationBtn').onclick = function() {
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(function(position) {
+                                document.getElementById('latitude').value = position.coords.latitude;
+                                document.getElementById('longitude').value = position.coords.longitude;
+                            }, function(error) {
+                                alert('Unable to retrieve your location');
+                            });
+                        } else {
+                            alert('Geolocation is not supported by this browser.');
+                        }
+                    };
+                </script>
                 
                 <div class="form-section">
                     <label for="latitude">Latitude</label>
@@ -36,30 +51,110 @@
             </div>
             
             <div class="file-upload">
-                <label for="image">
-                    <i class="fas fa-camera"></i> Upload Image
-                    <p class="text-muted">(Optional) Add a photo of the issue</p>
+                <label for="images">
+                    <i class="fas fa-camera"></i> Upload Images
+                    <p class="text-muted">(Optional) Add one or more photos of the issue</p>
                 </label>
-                <input type="file" id="image" name="image" accept="image/*">
+                <input type="file" id="images" name="images" accept="image/*" multiple onchange="validateImageCount(event); previewImages(event)">
+<div id="image-error" class="image-error-message" style="display:none;"></div>
             </div>
             
             <button type="submit" class="submit-btn">Submit Complaint</button>
+
+<!-- Image Preview Thumbnails -->
+<div id="image-preview" style="display:flex;gap:10px;margin-top:10px;"></div>
+
+<!-- Lightbox Modal -->
+<div id="lightboxModal" style="display:none;position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);justify-content:center;align-items:center;">
+    <img id="lightboxImg" src="" alt="Full Image" style="max-width:90vw;max-height:90vh;box-shadow:0 4px 32px #000;border-radius:8px;">
+</div>
         </form>
     </div>
 </div>
 
 <script>
-    document.getElementById('getLocationBtn').addEventListener('click', function() {
+    const btn = document.getElementById('getLocationBtn');
+    btn.addEventListener('click', function() {
         if (navigator.geolocation) {
+            btn.disabled = true;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting Location...';
             navigator.geolocation.getCurrentPosition(function(position) {
-                document.getElementById('latitude').value = position.coords.latitude;
-                document.getElementById('longitude').value = position.coords.longitude;
+                document.getElementById('latitude').value = position.coords.latitude.toFixed(8);
+                document.getElementById('longitude').value = position.coords.longitude.toFixed(8);
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }, function(error) {
-                alert('Error getting location: ' + error.message);
+                let msg = 'Error getting location: ' + error.message;
+                if (error.code === 1) {
+                    msg += '\nPlease allow location access in your browser settings and try again.';
+                }
+                alert(msg);
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }, {
+                enableHighAccuracy: true,
+                timeout: 20000,
+                maximumAge: 0
             });
         } else {
             alert('Geolocation is not supported by this browser.');
         }
     });
+// Limit image uploads to 4
+function validateImageCount(event) {
+    const input = event.target;
+    const errorDiv = document.getElementById('image-error');
+    if (input.files.length > 4) {
+        errorDiv.style.display = 'block';
+        errorDiv.textContent = 'No more than 4 photos can be uploaded.';
+        input.value = '';
+        event.preventDefault();
+    } else {
+        errorDiv.style.display = 'none';
+        errorDiv.textContent = '';
+    }
+}
+
+// Prevent form submission if more than 4 files selected (extra safety)
+document.getElementById('complaintForm').addEventListener('submit', function(e) {
+    const imagesInput = document.getElementById('images');
+    if (imagesInput.files.length > 4) {
+        const errorDiv = document.getElementById('image-error');
+        errorDiv.style.display = 'block';
+        errorDiv.textContent = 'No more than 4 photos can be uploaded.';
+        e.preventDefault();
+    }
+});
 </script>
+<style>
+.image-error-message {
+  display: none;
+  background: #fff4e5;
+  color: #b94a00;
+  border: 1px solid #ffb347;
+  border-radius: 10px;
+  padding: 0.75em 1em;
+  margin-top: 8px;
+  font-weight: 600;
+  font-size: 1.05em;
+  box-shadow: 0 2px 8px #ffb34733;
+  position: relative;
+  animation: shake 0.25s linear;
+}
+.image-error-message::before {
+  content: '\26A0'; /* Warning icon */
+  font-size: 1.2em;
+  margin-right: 0.6em;
+  vertical-align: middle;
+}
+@keyframes shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+</style>
 {% endblock %}

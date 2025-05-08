@@ -13,6 +13,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=lamb
 AUTH_USER_MODEL = 'accounts.CustomUser'
 # Application definition
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -91,6 +92,15 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Authentication Redirects
 LOGIN_URL = '/login/'
 LOGOUT_REDIRECT_URL = '/'
+
+# Jazzmin customizations
+JAZZMIN_SETTINGS = {
+    "site_title": "Road Complaint Portal",
+    "site_header": "Road Complaint Portal",
+    "site_brand": "Road Complaint Portal",
+    # You can add more Jazzmin settings here if needed
+}
+
 
 # settings.py
 AUTHENTICATION_BACKENDS = [

@@ -1,0 +1,79 @@
+{% extends 'admin/base_site.html' %}
+{% load static %}
+{% block content %}
+<div class="container" style="max-width: 900px; margin: 2rem auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #0001; padding: 2rem;">
+  <h1 style="font-size: 2rem; font-weight: 600; margin-bottom: 1.5rem;">Complaint Report Generation</h1>
+  <form method="get" action="" class="form-inline" style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
+    <div>
+      <label>Status:</label>
+      <select name="status" class="form-control">
+        <option value="">All</option>
+        <option value="Pending" {% if request.GET.status == 'Pending' %}selected{% endif %}>Pending</option>
+        <option value="In Progress" {% if request.GET.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+        <option value="Resolved" {% if request.GET.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+      </select>
+    </div>
+    <div>
+      <label>Time Period:</label>
+      <select name="period" id="periodFilter" class="form-control">
+        <option value="all" {% if request.GET.period == 'all' or not request.GET.period %}selected{% endif %}>All Time</option>
+        <option value="today" {% if request.GET.period == 'today' %}selected{% endif %}>Today</option>
+        <option value="week" {% if request.GET.period == 'week' %}selected{% endif %}>This Week</option>
+        <option value="month" {% if request.GET.period == 'month' %}selected{% endif %}>This Month</option>
+        <option value="custom" {% if request.GET.period == 'custom' %}selected{% endif %}>Custom Range</option>
+      </select>
+    </div>
+    <div id="customRangeFields" style="display: none;">
+      <label>From:</label>
+      <input type="date" name="from_date" class="form-control" value="{{ request.GET.from_date|default:'' }}">
+      <label>To:</label>
+      <input type="date" name="to_date" class="form-control" value="{{ request.GET.to_date|default:'' }}">
+    </div>
+    <button type="submit" class="btn btn-primary">Generate</button>
+    {% if complaints %}
+      <a href="?{{ request.GET.urlencode }}&print=1" target="_blank" class="btn btn-secondary">Print</a>
+    {% endif %}
+  </form>
+  <hr>
+  {% if complaints %}
+    <h3>Report Results ({{ complaints|length }})</h3>
+    <div style="overflow-x:auto;">
+      <table class="table table-striped" style="min-width: 600px;">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Status</th>
+            <th>Is Approved</th>
+            <th>Created At</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in complaints %}
+          <tr>
+            <td>{{ c.user }}</td>
+            <td>{{ c.status }}</td>
+            <td>{{ c.is_approved|yesno:"✔,✖" }}</td>
+            <td>{{ c.created_at|date:'M d, Y H:i' }}</td>
+            <td>{{ c.description|truncatechars:50 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% elif request.GET %}
+    <p>No complaints found for the selected criteria.</p>
+  {% endif %}
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var periodFilter = document.getElementById('periodFilter');
+  var customRangeFields = document.getElementById('customRangeFields');
+  function toggleCustomRange() {
+    customRangeFields.style.display = (periodFilter.value === 'custom') ? 'flex' : 'none';
+  }
+  periodFilter.addEventListener('change', toggleCustomRange);
+  toggleCustomRange();
+});
+</script>
+{% endblock %}

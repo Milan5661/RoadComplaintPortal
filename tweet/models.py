@@ -16,7 +16,6 @@ class Complaint(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     description = models.TextField()
     address = models.CharField(max_length=255, blank=True, null=True) 
-    image = models.ImageField(upload_to='complaint_images/', null=True, blank=True)
     created_at= models.DateTimeField(auto_now_add=True)
     is_approved = models.BooleanField(default=False) 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
@@ -27,6 +26,13 @@ class Complaint(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.status}"
 
+
+class ComplaintImage(models.Model):
+    complaint = models.ForeignKey(Complaint, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='complaint_images/')
+
+    def __str__(self):
+        return f"Image for Complaint {self.complaint.id}"
 
 class AdminProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='admin_profile')

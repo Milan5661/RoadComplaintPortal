@@ -1,47 +1,91 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load geo_filters %}
 {% block title %}Complaints List - Road Complaint Portal{% endblock %}
 
 {% block content %}
-<div class="complaint-container">
-    <div class="complaint-card">
-        <h2 class="complaint-title">Complaints List</h2>
-        
-        <div class="complaints-grid">
-            {% for complaint in complaints %}
-            <div class="complaint-item">
-                {% if complaint.image %}
-                <div class="complaint-image">
-                    <img src="{{ complaint.image.url }}" alt="Complaint Image">
-                </div>
-                {% else %}
-                <div class="complaint-image"></div>
-                {% endif %}
-                <div class="complaint-status">
-                    <strong>Status:</strong> {{ complaint.status }}
-                </div>
-                {% endif %}
-                
-                <div class="complaint-content">
-                    <div class="complaint-meta">
-                        <i class="fas fa-calendar"></i> {{ complaint.date_reported|date:"F j, Y" }}
-                    </div>
-                    
-                    <h3 class="complaint-card-title">{{ complaint.address }}</h3>
-                    <p class="complaint-text">{{ complaint.description }}</p>
-                    
-                    <span class="complaint-status {% if complaint.status == 'Pending' %}status-pending{% elif complaint.status == 'In Progress' %}status-in-progress{% else %}status-resolved{% endif %}">
-                        {{ complaint.status }}
-                    </span>
-                </div>
-            </div>
-            {% empty %}
-            <div class="complaint-item" style="text-align: center;">
-                <p style="color: #666; margin: 2rem 0;">No complaints submitted yet.</p>
-                <a href="{% url 'submit_complaint' %}" class="submit-btn" style="display: inline-block; text-decoration: none;">Submit a Complaint</a>
-            </div>
-            {% endfor %}
-        </div>
+<div class="view-complaints-stack" style="display: flex; flex-direction: column; align-items: flex-start; gap: 32px; margin-top: 32px; margin-left: 60px;">
+    {% for complaint in complaints %}
+    <div class="view-complaint-card" style="background: #fff; border-radius: 16px; box-shadow: 0 2px 16px rgba(60,60,120,0.08); padding: 28px 28px 18px 28px; width: 100%; max-width: 480px; margin-bottom: 0; display: flex; flex-direction: column; align-items: flex-start;">
+      <div class="view-complaint-header" style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 8px;">
+        <span class="view-complaint-type" style="font-weight: 600; font-size: 1.1em; color: #3a37a6;"><i class="fa fa-exclamation-circle me-1"></i>{{ complaint.type|default:"Complaint" }}</span>
+        <span class="view-complaint-status-badge {% if complaint.status == 'Pending' %}pending{% elif complaint.status == 'In Progress' %}progress{% else %}resolved{% endif %}" style="padding: 4px 14px; border-radius: 12px; font-size: 0.93em; font-weight: 500; background: {% if complaint.status == 'Pending' %}#ffe066{% elif complaint.status == 'In Progress' %}#74c0fc{% else %}#b2f2bb{% endif %}; color: #333; margin-left: auto;">
+          {{ complaint.status }}
+        </span>
+      </div>
+      <div class="view-complaint-meta mb-2" style="color: #6c757d; font-size: 0.97em; margin-bottom: 4px;">
+        <span class="view-complaint-date"><i class="fa fa-calendar-alt me-1"></i> {{ complaint.created_at|date:"M d, Y" }}</span>
+      </div>
+      <div class="view-complaint-description mb-2" style="margin-bottom: 8px;">
+        <span class="fw-bold" style="color: #444;">Description:</span>
+        <div class="text-muted" style="margin-top: 2px; color: #555;">{{ complaint.description|linebreaksbr }}</div>
+      </div>
+      {% if complaint.images.all %}
+      <div class="view-complaint-images-grid" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+  {% for img in complaint.images.all %}
+    <a href="#" class="complaint-img-thumb" data-img-url="{{ img.image.url }}" onclick="showInlineImage(this, '{{ complaint.id }}'); return false;">
+      <img src="{{ img.image.url }}" alt="Complaint Image" style="width: 64px; height: 64px; object-fit: cover; border-radius: 6px; border: 1px solid #eee; display: inline-block; vertical-align: middle;" />
+    </a>
+  {% endfor %}
+</div>
+<div class="inline-image-preview" id="inline-image-preview-{{ complaint.id }}" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.9); z-index:1000;">
+  <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);">
+    <img id="inline-image-{{ complaint.id }}" src="" alt="Complaint Large" style="max-width: 100%; max-height: 90vh; object-fit: contain; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.15);" />
+    <button type="button" onclick="hideInlineImage('{{ complaint.id }}')" style="position:absolute; top:16px; right:16px; background:#fff; border:none; border-radius:50%; box-shadow:0 1px 4px #aaa; width:32px; height:32px; font-size:18px; cursor:pointer; color:#000;">&times;</button>
+  </div>
+</div>
+      {% endif %}
+      {% if complaint.latitude and complaint.longitude %}
+      <div class="view-complaint-location mt-2">
+        <a href="https://www.google.com/maps?q={{ complaint.latitude }},{{ complaint.longitude }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary view-map-btn"><i class="fa fa-map-marker-alt"></i> View Map</a>
+      </div>
+      {% endif %}
     </div>
+    {% empty %}
+    <div class="complaint-item" style="text-align: center;">
+      <p style="color: #666; margin: 2rem 0;">No complaints submitted yet.</p>
+      <a href="{% url 'submit_complaint' %}" class="submit-btn" style="display: inline-block; text-decoration: none;">Submit a Complaint</a>
+    </div>
+    {% endfor %}
+
+<script>
+function showInlineImage(link, complaintId) {
+  var imgUrl = link.getAttribute('data-img-url');
+  var previewDiv = document.getElementById('inline-image-preview-' + complaintId);
+  var imgTag = document.getElementById('inline-image-' + complaintId);
+  imgTag.src = imgUrl;
+  previewDiv.style.display = 'block';
+}
+function hideInlineImage(complaintId) {
+  var previewDiv = document.getElementById('inline-image-preview-' + complaintId);
+  var imgTag = document.getElementById('inline-image-' + complaintId);
+  imgTag.src = '';
+  previewDiv.style.display = 'none';
+}
+</script>
+
+{% if complaints.has_other_pages %}
+<nav aria-label="Complaints pagination" style="margin: 32px 0; display: flex; justify-content: center;">
+  <ul class="pagination" style="gap: 5px;">
+    {% if complaints.has_previous %}
+      <li class="page-item"><a class="page-link" href="?page={{ complaints.previous_page_number }}">&laquo; Prev</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">&laquo; Prev</span></li>
+    {% endif %}
+    {% for num in complaints.paginator.page_range %}
+      {% if complaints.number == num %}
+        <li class="page-item active"><span class="page-link" style="background:#3a37a6; color:#fff;">{{ num }}</span></li>
+      {% else %}
+        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if complaints.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ complaints.next_page_number }}">Next &raquo;</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Next &raquo;</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
 </div>
 {% endblock %}

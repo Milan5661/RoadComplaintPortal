@@ -6,25 +6,147 @@
 <section class="complaints-section">
     <div class="container">
         <h2>Recent Complaints</h2>
-        <ul class="complaint-list">
-            {% for complaint in complaints %}
-            <li style="min-width: 300px; flex: 0 0 auto;">
-                <h3>Complaint #{{ complaint.id }}</h3>
-                <p><strong>Description:</strong> {{ complaint.description }}</p>
-                <p><strong>Location:</strong> {{ complaint.location }}</p>
-                {% if complaint.image %}
-                <img src="{{ complaint.image.url }}" alt="Complaint Image" class="complaint-image">
-                {% endif %}
-                <p><strong>Date Reported:</strong> {{ complaint.date_reported }}</p>
-                <p><strong>Status:</strong> {{ complaint.status }}</p>
-                <div class="complaint-status">
-                    <strong>Status:</strong> {{ complaint.status }}
-                </div>
-            </li>
-            {% empty %}
-            <p>No complaints found.</p>
-            {% endfor %}
-        </ul>
+        <div class="view-complaints-grid">
+    {% for complaint in complaints %}
+    <div class="view-complaint-card">
+      <div class="view-complaint-header">
+        <span class="view-complaint-type">{{ complaint.type|default:"Complaint" }}</span>
+        <span class="view-complaint-status-badge {% if complaint.status == 'Pending' %}pending{% elif complaint.status == 'In Progress' %}progress{% else %}resolved{% endif %}">
+          {{ complaint.status }}
+        </span>
+      </div>
+      <div class="view-complaint-meta mb-2">
+        <span class="view-complaint-date"><i class="fa fa-calendar-alt"></i> {{ complaint.created_at|date:"M d, Y" }}</span>
+      </div>
+      <div class="view-complaint-description mb-2">
+        <span class="fw-bold">Description:</span>
+        <div class="text-muted">{{ complaint.description|linebreaksbr }}</div>
+      </div>
+      {% if complaint.images.all %}
+      <div class="view-complaint-images-grid">
+        {% for img in complaint.images.all %}
+        <a href="#" data-bs-toggle="modal" data-bs-target="#viewImageModal{{ complaint.id }}_{{ forloop.counter }}">
+          <img src="{{ img.image.url }}" alt="Complaint Image" />
+        </a>
+        <!-- Modal -->
+        <div class="modal fade" id="viewImageModal{{ complaint.id }}_{{ forloop.counter }}" tabindex="-1" aria-labelledby="viewImageModalLabel{{ complaint.id }}_{{ forloop.counter }}" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="viewImageModalLabel{{ complaint.id }}_{{ forloop.counter }}">Complaint Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body text-center">
+                <img src="{{ img.image.url }}" alt="Complaint Image" style="max-width: 98vw; max-height: 90vh; border-radius: 10px;" />
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% if complaint.latitude and complaint.longitude %}
+      <div class="view-complaint-location mt-2">
+        <a href="https://www.google.com/maps?q={{ complaint.latitude }},{{ complaint.longitude }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary view-map-btn"><i class="fa fa-map-marker-alt"></i> View Map</a>
+      </div>
+      {% endif %}
+    </div>
+    {% empty %}
+    <p>No complaints found.</p>
+    {% endfor %}
+</div>
     </div>
 </section>
+
+<style>
+.view-complaints-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 2rem;
+}
+.view-complaint-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px #0001;
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s, transform 0.2s;
+  position: relative;
+}
+.view-complaint-card:hover {
+  box-shadow: 0 8px 32px #0002;
+  transform: translateY(-4px) scale(1.01);
+}
+.view-complaint-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+.view-complaint-type {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #2a5298;
+}
+.view-complaint-status-badge {
+  padding: 0.3em 0.9em;
+  border-radius: 12px;
+  font-size: 0.95em;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.03em;
+  box-shadow: 0 1px 4px #0001;
+}
+.view-complaint-status-badge.pending {
+  background: #ffc107;
+  color: #5a4300;
+}
+.view-complaint-status-badge.progress {
+  background: #17a2b8;
+}
+.view-complaint-status-badge.resolved {
+  background: #38e8ad;
+  color: #0c3c2f;
+}
+.view-complaint-meta {
+  display: flex;
+  justify-content: flex-start;
+  gap: 1.1rem;
+  font-size: 0.97em;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+.view-complaint-meta i {
+  margin-right: 0.3em;
+}
+.view-complaint-location .view-map-btn {
+  margin-left: 0.2em;
+  padding: 0.18em 0.8em;
+  font-size: 0.93em;
+  border-radius: 8px;
+}
+.view-complaint-description {
+  text-align: left;
+  margin-bottom: 0.9rem;
+}
+.view-complaint-images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 10px;
+  margin-top: 0.5rem;
+}
+.view-complaint-images-grid img {
+  max-width: 80px;
+  max-height: 80px;
+  border-radius: 6px;
+  border: 1px solid #eee;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+  background: #fafbfc;
+}
+.view-complaint-images-grid img:hover {
+  box-shadow: 0 2px 12px #38e8ad33;
+}
+</style>
 {% endblock %}

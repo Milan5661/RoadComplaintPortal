@@ -21,7 +21,7 @@ class CustomAuthenticationBackend(ModelBackend):
                     return user
                 else:
                     user.increment_failed_attempts()
-                    raise ValidationError('Incorrect password, please try again.')
+                    return None
 
         except CustomUser.DoesNotExist:
             return None

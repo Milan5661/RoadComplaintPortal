@@ -7,10 +7,18 @@
 <div class="container py-5">
     <h1 class="text-center mb-5" style="font-weight: bold; font-size: 2.5rem;">Road Complaint Dashboard</h1>
     
-    <div class="row d-flex justify-content-between">
+    <div class="row">
+    <div class="col-md-2">
+        <div class="list-group">
+            <a href="/admin/tweet/complaint/" class="list-group-item list-group-item-action">Complaints</a>
+            <a href="/report-generation/" class="list-group-item list-group-item-action">Report Generation</a>
+        </div>
+    </div>
+    <div class="col-md-10">
+
         <!-- Left Card: Total Complaints -->
         <div class="col-md-3">
-            <div class="card text-center shadow p-4 rounded-4 border-0 bg-light h-100">
+            <div class="card text-center shadow p-4 rounded-4 border-0 bg-light h-100 dashboard-card">
                 <div class="card-body">
                     <i class="fas fa-list fa-3x mb-3 text-primary"></i>
                     <h2 id="totalComplaints" class="counter mb-2" style="font-size: 2.5rem;">0</h2>
@@ -21,7 +29,7 @@
 
         <!-- Center Card: Pending Complaints -->
         <div class="col-md-3">
-            <div class="card text-center shadow p-4 rounded-4 border-0 bg-light h-100">
+            <div class="card text-center shadow p-4 rounded-4 border-0 bg-light h-100 dashboard-card">
                 <div class="card-body">
                     <i class="fas fa-hourglass-half fa-3x mb-3 text-warning"></i>
                     <h2 id="pendingComplaints" class="counter mb-2" style="font-size: 2.5rem;">0</h2>
@@ -32,7 +40,7 @@
 
         <!-- Right Card: Resolved Complaints -->
         <div class="col-md-3">
-            <div class="card text-center shadow p-4 rounded-4 border-0 bg-light h-100">
+            <div class="card text-center shadow p-4 rounded-4 border-0 bg-light h-100 dashboard-card">
                 <div class="card-body">
                     <i class="fas fa-check-circle fa-3x mb-3 text-success"></i>
                     <h2 id="resolvedComplaints" class="counter mb-2" style="font-size: 2.5rem;">0</h2>
@@ -40,7 +48,7 @@
                 </div>
             </div>
         </div>
-    </div>
+        </div>
 </div>
 
 <!-- Counter Animation -->
@@ -62,11 +70,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 40);
     }
 
-    animateCounter('totalComplaints', {{ total_complaints }});
-    animateCounter('resolvedComplaints', {{ resolved_complaints }});
-    animateCounter('pendingComplaints', {{ pending_complaints }});
+    animateCounter('totalComplaints', Number("{{ total_complaints|default:0 }}"));
+    animateCounter('resolvedComplaints', Number("{{ resolved_complaints|default:0 }}"));
+    animateCounter('pendingComplaints', Number("{{ pending_complaints|default:0 }}"));
 });
 </script>
+
+<!-- Hover and Card Animations (CSS) -->
+<style>
+.dashboard-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+</style>
 
 <!-- Font Awesome for icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
