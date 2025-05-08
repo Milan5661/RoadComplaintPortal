@@ -1,11 +1,13 @@
 /* General Styles */
-body {
-    font-family: 'Poppins', 'Montserrat', sans-serif;
+html, body {
     margin: 0;
     padding: 0;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Poppins', 'Montserrat', sans-serif;
     background: url('../img/home-bg.jpg') center center/cover no-repeat fixed, linear-gradient(120deg, #e0eaff 0%, #f8f9fa 100%);
     color: #222;
     box-sizing: border-box;
@@ -35,36 +37,166 @@ body::before {
 }
 
 /* Responsive reports/charts */
-.reports-section > div {
+.reports-section {
+    padding: 0.75rem;
+    margin: 0.5rem auto;
+    max-width: 1200px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+.reports-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    width: 100%;
+}
+
+.report-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.filter-form {
     display: flex;
     flex-wrap: wrap;
-    gap: 2rem;
-    justify-content: center;
-    align-items: flex-start;
-}
-.reports-section > div > div {
-    flex: 1 1 350px;
-    min-width: 320px;
-    max-width: 500px;
-    background: rgba(255,255,255,0.95);
-    border-radius: 16px;
-    box-shadow: 0 2px 8px #0001;
-    padding: 1.5rem;
+    gap: 0.75rem;
+    align-items: center;
     margin-bottom: 1rem;
 }
 
-@media (max-width: 1100px) {
-    .reports-section > div {
-        flex-direction: column;
-        align-items: center;
+.filter-label {
+    font-weight: 500;
+    margin-right: 0.5rem;
+    white-space: nowrap;
+}
+
+.filter-select {
+    width: 160px;
+    max-width: 100%;
+}
+
+.filter-input {
+    display: none;
+    width: 140px;
+    max-width: 100%;
+}
+
+.filter-input[type="number"] {
+    width: 100px;
+}
+
+.filter-button {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+}
+
+.report-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    overflow: visible;
+}
+
+.chart-container {
+    width: 100%;
+    height: 200px;
+    position: relative;
+    margin: 0.5rem 0;
+}
+
+.chart-container canvas {
+    max-width: 100%;
+}
+
+@media (max-width: 1024px) {
+    .reports-section {
+        padding: 1rem;
+    }
+    .reports-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
     }
 }
 
-@media (max-width: 700px) {
-    .reports-section > div > div {
-        min-width: 98vw;
-        max-width: 98vw;
-        padding: 1rem 0.2rem;
+@media (max-width: 768px) {
+    .reports-section {
+        padding: 0.5rem;
+    }
+
+    .report-card {
+        padding: 0.75rem;
+    }
+
+    .filter-form {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .filter-select,
+    .filter-input {
+        width: 100%;
+        height: 36px;
+        font-size: 14px;
+    }
+    
+    .filter-button {
+        width: 100%;
+        height: 36px;
+    }
+    
+    .chart-container {
+        min-height: 200px;
+        margin: 0;
+    }
+
+    .chart-container canvas {
+        height: 100% !important;
+        max-height: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .reports-section {
+        padding: 0.25rem;
+        margin: 0;
+    }
+    
+    .report-card {
+        padding: 0.5rem;
+        border-radius: 0;
+    }
+
+    .filter-form {
+        padding: 0.5rem;
+    }
+
+    .chart-container {
+        min-height: 180px;
+    }
+
+    .chart-container canvas {
+        max-height: 250px;
+    }
+
+    h2.text-center {
+        font-size: 1.2rem;
+        margin: 0.5rem 0;
     }
 }
 
@@ -137,12 +269,10 @@ body::before {
     z-index: 2;
     padding: 3.5rem 2rem 2.5rem 2rem;
     max-width: 600px;
-    background: linear-gradient(to bottom, #000099 0%, #ccccff 100%);
     margin: 0 auto;
     border-radius: 28px;
-    box-shadow: 0 8px 40px 0 rgba(31, 38, 135, 0.20);
     animation: fadeIn 1s cubic-bezier(.77,0,.18,1);
-    backdrop-filter: blur(14px) saturate(140%);
+    background: transparent;
 }
 .hero-icon {
     margin-bottom: 1.2rem;
@@ -155,20 +285,16 @@ body::before {
 .hero-content h1 {
     font-size: 2.8rem;
     font-weight: 900;
-    text-shadow: 0 4px 18px #0002, 0 2px 6px #fff6;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     letter-spacing: 1.5px;
-    background: linear-gradient(90deg, #ffb347 30%, #38e8ad 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: white;
     margin-bottom: 1.1rem;
 }
 .hero-desc {
     font-size: 1.25rem;
-    opacity: 0.97;
     line-height: 1.7;
-    color: #f8f9fa;
-    text-shadow: 0 2px 8px #0001;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     margin-bottom: 2.2rem;
 }
 .hero-stats {
@@ -1070,13 +1196,18 @@ body::before {
     display: flex;
     flex-direction: column;
     position: relative;
-    overflow: auto;/* This forces the div to contain its children properly */
+    overflow: hidden;
+}
+
+body {
+    overflow: hidden;
 }
 
 main {
     flex: 1;
     width: 100%;
-    padding-top: 60px; /* Match navbar height */
+    padding-top: 60px;
+    overflow: hidden;
 }
 
 /* Navbar Styles */

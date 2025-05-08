@@ -3,69 +3,37 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const images = [
-        "{% static 'images/city1.jpg' %}",
-        "{% static 'images/road1.jpg' %}",
-        "{% static 'images/road2.jpg' %}",
-        "{% static 'images/road3.jpg' %}",
-        "{% static 'images/road4.jpg' %}",
-        "{% static 'images/road5.jpg' %}"
-    ];
-    let idx = 0;
-    function changeHeroBg() {
-        const hero = document.querySelector('.hero');
-        if (hero) {
-            hero.style.background = `url('${images[idx]}') center center/cover no-repeat fixed`;
-        }
-        idx = (idx + 1) % images.length;
+    // Remove dynamic background changes for better performance
+    const hero = document.querySelector('.hero');
+    if (hero) {
+        hero.style.background = "url('{% static 'images/road1.jpg' %}') center center/cover no-repeat";
     }
-    changeHeroBg(); // Initial
-    setInterval(changeHeroBg, 5000); // Change every 5 seconds
 });
 </script>
 <style>
 .page-wrapper {
-    background: url("{% static 'images/road1.jpg' %}") center center/cover no-repeat fixed !important;
-}
-body {
-    background: none !important;
+    background: #f5f5f5;
 }
 
 .hero {
-    background: transparent !important;
-    box-shadow: none !important;
+    background: url("{% static 'images/road1.jpg' %}") center center/cover no-repeat;
+    position: relative;
 }
 
-body {
-    background: url("{% static 'images/road1.jpg' %}") center center/cover no-repeat fixed;
-    min-height: 100vh;
-}
-.hero-content {
-    background: url("{% static 'images/city1.jpg' %}") center center/cover no-repeat;
-    border-radius: 28px;
-    box-shadow: 0 8px 40px 0 rgba(31, 38, 135, 0.20);
-    animation: fadeIn 1s cubic-bezier(.77,0,.18,1);
-    backdrop-filter: blur(14px) saturate(140%);
-    padding: 3.5rem 2rem 2.5rem 2rem;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-body {
-    background: none !important;
-}
-.page-wrapper, main, header, section {
-    background: transparent !important;
-}
-body::before {
+.hero::before {
     content: '';
-    position: fixed;
+    position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(255,255,255,0.4); /* More transparent overlay */
+    background: rgba(0,0,0,0.4);
     z-index: 1;
-    pointer-events: none;
 }
-.page-wrapper, main, header, section, footer {
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.page-wrapper, main, header, section {
     position: relative;
     z-index: 2;
 }
@@ -130,22 +98,22 @@ body::before {
     </div>
 </main>
 <!-- Reports Section: Side by Side -->
-<section class="reports-section" style="margin: 2rem auto; max-width: 1200px;">
-  <div style="display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; align-items: flex-start;">
+<section class="reports-section">
+  <div class="reports-grid">
     <!-- Complaints Bar Graph Card (with filter) -->
-    <div style="flex: 1 1 350px; min-width: 340px; max-width: 500px; background: #fff; border-radius: 16px; box-shadow: 0 2px 8px #0001; padding: 1.5rem; display: flex; flex-direction: column;">
-      <form id="reportFilterForm" method="get" style="display: flex; gap: 0.5rem; align-items: center; justify-content: flex-end; margin-bottom: 1rem;">
-        <label for="filterPeriod" style="font-weight: 500; margin-right: 0.5rem;">Show Data For:</label>
-        <select name="filter" id="filterPeriod" class="form-select" style="width: 160px;">
+    <div class="report-card">
+      <form id="reportFilterForm" method="get" class="filter-form">
+        <label for="filterPeriod" class="filter-label">Show Data For:</label>
+        <select name="filter" id="filterPeriod" class="form-select filter-select">
           <option value="7d" {% if filter == '7d' or not filter %}selected{% endif %}>Last 7 Days</option>
           <option value="month" {% if filter == 'month' %}selected{% endif %}>This Month</option>
           <option value="year" {% if filter == 'year' %}selected{% endif %}>This Year</option>
           <option value="custom_month" {% if filter == 'custom_month' %}selected{% endif %}>Custom Month</option>
           <option value="custom_year" {% if filter == 'custom_year' %}selected{% endif %}>Custom Year</option>
         </select>
-        <input type="month" name="month" id="monthPicker" class="form-control" style="display:none; width:140px;" value="{{ month|default:'' }}">
-        <input type="number" name="year" id="yearPicker" class="form-control" style="display:none; width:100px;" min="2000" max="2100" placeholder="Year" value="{{ year|default:'' }}">
-        <button type="submit" class="btn btn-primary" style="padding: 4px 16px; font-size: 15px;">Apply</button>
+        <input type="month" name="month" id="monthPicker" class="form-control filter-input" value="{{ month|default:'' }}">
+        <input type="number" name="year" id="yearPicker" class="form-control filter-input" min="2000" max="2100" placeholder="Year" value="{{ year|default:'' }}">
+        <button type="submit" class="btn btn-primary filter-button">Apply</button>
       </form>
       <script>
       document.addEventListener('DOMContentLoaded', function() {
@@ -161,8 +129,8 @@ body::before {
       });
       </script>
       <h2 class="text-center mb-3">Complaints Report</h2>
-      <div style="width:100%; min-height: 320px; display: flex; align-items: center; justify-content: center;">
-        <canvas id="complaints7DaysBarChart" height="320"></canvas>
+      <div class="chart-container">
+        <canvas id="complaints7DaysBarChart"></canvas>
       </div>
     </div>
     <!-- All-Time Pie Chart Card -->
@@ -256,16 +224,30 @@ document.addEventListener('DOMContentLoaded', function() {
                     'rgba(33,150,243,1)',
                     'rgba(76,175,80,1)'
                 ],
-                borderWidth: 2
+                borderWidth: 2,
+                barThickness: 'flex',
+                maxBarThickness: 35
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    left: 10,
+                    right: 10,
+                    top: 0,
+                    bottom: 10
+                }
+            },
             plugins: {
                 legend: {
                     display: false
                 },
                 tooltip: {
+                    enabled: true,
+                    mode: 'index',
+                    intersect: false,
                     callbacks: {
                         label: function(context) {
                             let value = context.parsed.y;
@@ -279,12 +261,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Number of Complaints'
+                        text: 'Number of Complaints',
+                        font: {
+                            size: 11
+                        }
+                    },
+                    ticks: {
+                        font: {
+                            size: 10
+                        }
                     }
                 },
                 x: {
                     title: {
                         display: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 10
+                        }
                     }
                 }
             }
@@ -312,16 +307,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     'rgba(33,150,243,1)',
                     'rgba(76,175,80,1)'
                 ],
-                borderWidth: 2
+                borderWidth: 2,
+                radius: '80%'
             }]
         },
         options: {
+            responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     display: true,
                     position: 'bottom',
                     labels: {
-                        font: { size: 15 }
+                        boxWidth: 12,
+                        padding: 10,
+                        font: { size: 12 }
                     }
                 },
                 tooltip: {

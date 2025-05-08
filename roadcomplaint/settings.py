@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Security settings
 SECRET_KEY = config('SECRET_KEY', default='your-secret-key-here')
 DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=lambda v: v.split(','))
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost,', cast=lambda v: v.split(','))
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 # Application definition
