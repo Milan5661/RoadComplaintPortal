@@ -1070,7 +1070,7 @@ body::before {
     display: flex;
     flex-direction: column;
     position: relative;
-    overflow: auto;/* This forces the div to contain its children properly */
+    /* overflow: auto; Removed to prevent double scrollbars */
 }
 
 main {
