@@ -1,4 +1,4 @@
-asgiref==3.8.1
+souasgiref==3.8.1
 Django==5.1.6
 djangorestframework==3.15.2
 pillow==11.1.0

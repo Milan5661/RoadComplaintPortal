@@ -68,8 +68,15 @@ class ComplaintAdmin(admin.ModelAdmin):
         if not extra_context:
             extra_context = {}
         extra_context['report_generation_url'] = '/admin/tweet/complaint/report-generation/'
-        # Add a flag to render a custom button in the template
         extra_context['show_report_generation_button'] = True
+        # Add a custom button to the object-tools block (top right)
+        if 'object_tools' not in extra_context:
+            extra_context['object_tools'] = []
+        extra_context['object_tools'].append({
+            'url': extra_context['report_generation_url'],
+            'label': 'Report Generation',
+            'class': 'btn btn-info',
+        })
         return super().changelist_view(request, extra_context=extra_context)
 
     def map_view(self, obj):

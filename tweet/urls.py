@@ -10,6 +10,7 @@ from .views import (
 app_name = "tweet"
 
 urlpatterns = [
+    path('report/', views.admin_report, name='admin_report'),
     path('report-generation/', views.report_generation, name='report_generation'),
     # Home Page
     path('', home, name='home'),

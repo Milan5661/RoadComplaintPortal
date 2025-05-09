@@ -18,18 +18,16 @@
     <!-- Animate.css for page animations -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
 </head>
-<body class="d-flex flex-column min-vh-100" style="font-family: 'Roboto', sans-serif;">
+<body class="d-flex flex-column min-vh-100" style="font-family: 'Roboto', sans-serif; margin: 0; padding: 0; overflow-y: scroll;">
     {% include 'navbar.html' %}  
 
-    <div class="page-wrapper">
+    <div class="page-wrapper" style="min-height: 100vh; display: flex; flex-direction: column;">
         <main class="flex-fill animate__animated animate__fadeIn">
             {% block content %}{% endblock %}
         </main>
 
         <footer class="bg-dark text-white text-center py-3 mt-auto animate__animated animate__fadeInUp">
-            <br>
             <p align="center">&copy; 2025 Road Complaint Portal. All Rights Reserved.</p>
-            <br>
         </footer>
     </div>
 

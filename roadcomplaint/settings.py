@@ -93,15 +93,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGIN_URL = '/login/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Jazzmin customizations
-JAZZMIN_SETTINGS = {
-    "site_title": "Road Complaint Portal",
-    "site_header": "Road Complaint Portal",
-    "site_brand": "Road Complaint Portal",
-    # You can add more Jazzmin settings here if needed
-}
-
-
 # settings.py
 AUTHENTICATION_BACKENDS = [
     'accounts.authentication.CustomAuthenticationBackend',  # Use the correct app name here

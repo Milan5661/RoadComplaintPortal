@@ -16,7 +16,40 @@ from .serializers import ComplaintSerializer
 import random
 import re
 from django.core.paginator import Paginator
+from collections import Counter
 # ----------------- Static Pages -------------
+
+from django.contrib.admin.views.decorators import staff_member_required
+from collections import Counter
+
+@staff_member_required
+def admin_report(request):
+    # Category: currently only 'status', can be expanded
+    category = request.GET.get('category', 'status')
+    timeframe = request.GET.get('timeframe', 'week')
+
+    qs = Complaint.objects.all()
+    now = timezone.now()
+    if timeframe == 'week':
+        start = now - datetime.timedelta(days=now.weekday())
+        qs = qs.filter(created_at__date__gte=start.date())
+    elif timeframe == 'month':
+        qs = qs.filter(created_at__year=now.year, created_at__month=now.month)
+    elif timeframe == 'year':
+        qs = qs.filter(created_at__year=now.year)
+
+    report_data = {}
+    if category == 'status':
+        # Count complaints by status
+        status_counts = Counter(qs.values_list('status', flat=True))
+        report_data = dict(status_counts)
+
+    context = {
+        'report_data': report_data,
+        'category': category,
+        'timeframe': timeframe,
+    }
+    return render(request, 'report.html', context)
 
 @staff_member_required
 def report_generation(request):

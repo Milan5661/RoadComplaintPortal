@@ -1,5 +1,6 @@
 {% extends 'admin/base_site.html' %}
 {% load static %}
+{% load complaint_extras %}
 {% block content %}
 <div class="container" style="max-width: 900px; margin: 2rem auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #0001; padding: 2rem;">
   <h1 style="font-size: 2rem; font-weight: 600; margin-bottom: 1.5rem;">Complaint Report Generation</h1>
@@ -35,6 +36,32 @@
     {% endif %}
   </form>
   <hr>
+  <!-- Analytics Summary Table -->
+  <div class="mb-4">
+    <h4>Analytics Summary</h4>
+    <table class="table table-bordered w-auto" style="max-width: 400px;">
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Pending</td>
+          <td>{{ complaints|count_status:'Pending' }}</td>
+        </tr>
+        <tr>
+          <td>In Progress</td>
+          <td>{{ complaints|count_status:'In Progress' }}</td>
+        </tr>
+        <tr>
+          <td>Resolved</td>
+          <td>{{ complaints|count_status:'Resolved' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
   {% if complaints %}
     <h3>Report Results ({{ complaints|length }})</h3>
     <div style="overflow-x:auto;">

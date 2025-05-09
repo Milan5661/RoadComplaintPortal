@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Report | Road Complaint Portal{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Reports & Analytics</h2>
+    <form method="get" class="mb-4 d-flex flex-row gap-2">
+        <label for="category">Category:</label>
+        <select name="category" id="category" class="form-select w-auto">
+            <option value="status">Status</option>
+        </select>
+        <label for="timeframe">Time Frame:</label>
+        <select name="timeframe" id="timeframe" class="form-select w-auto">
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="year">This Year</option>
+        </select>
+        <button type="submit" class="btn btn-primary">View Report</button>
+    </form>
+    <div>
+        {% if report_data %}
+            <h4>Report ({{ timeframe|title }})</h4>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for status, count in report_data.items %}
+                    <tr>
+                        <td>{{ status }}</td>
+                        <td>{{ count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No data available for the selected criteria.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

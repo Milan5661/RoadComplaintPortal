@@ -5,7 +5,7 @@
 {% block content %}
 <section class="complaints-section">
     <div class="container">
-        <h2>Recent Complaints</h2>
+        <h2 class="text-center mb-4">Recent Complaints</h2>
         <div class="view-complaints-grid">
     {% for complaint in complaints %}
     <div class="view-complaint-card">
@@ -59,10 +59,17 @@
 </section>
 
 <style>
+.complaints-section {
+  padding: 2rem 1rem;
+}
+
 .view-complaints-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 400px));
   gap: 2rem;
+  justify-content: center;
+  margin: 0 auto;
+  max-width: 1200px;
 }
 .view-complaint-card {
   background: #fff;
@@ -73,6 +80,8 @@
   flex-direction: column;
   transition: box-shadow 0.2s, transform 0.2s;
   position: relative;
+  width: 100%;
+  margin: 0 auto;
 }
 .view-complaint-card:hover {
   box-shadow: 0 8px 32px #0002;
