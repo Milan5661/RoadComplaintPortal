@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Management Dashboard Preview</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; margin: 0; }
+        .container { max-width: 1100px; margin: 2rem auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #0001; padding: 2rem; }
+        h1 { font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 2rem; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f0f4fa; }
+        tr:nth-child(even) { background: #fafbfc; }
+        .actions button { margin-right: 8px; padding: 6px 14px; border: none; border-radius: 5px; cursor: pointer; }
+        .activate { background: #38e8ad; color: #fff; }
+        .deactivate { background: #ffb347; color: #fff; }
+        .reset { background: #2196f3; color: #fff; }
+        .view { background: #2a5298; color: #fff; }
+        .role { background: #e0eaff; color: #2a5298; border-radius: 4px; padding: 2px 8px; font-size: 0.95em; }
+        .filter-bar { margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center; }
+        .filter-bar input, .filter-bar select { padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc; }
+        .user-details { background: #f8f9fa; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 2rem; }
+        .user-details h2 { margin-top: 0; }
+        .complaints-table { margin-top: 1rem; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>User Management Dashboard <span style="font-size:1rem;font-weight:400;color:#888;">(Preview)</span></h1>
+    <div class="filter-bar">
+        <input type="text" placeholder="Search by username or email...">
+        <select>
+            <option value="">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+        </select>
+        <select>
+            <option value="">All Roles</option>
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+            <option value="moderator">Moderator</option>
+        </select>
+        <button style="background:#2a5298;color:#fff;padding:7px 18px;border-radius:5px;">Filter</button>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Role</th>
+                <th>Date Joined</th>
+                <th>Complaints</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>john_doe</td>
+                <td>john@example.com</td>
+                <td><span style="color:green;font-weight:600;">Active</span></td>
+                <td><span class="role">User</span></td>
+                <td>2024-01-15</td>
+                <td>5</td>
+                <td class="actions">
+                    <button class="deactivate">Deactivate</button>
+                    <button class="reset">Reset Password</button>
+                    <button class="view" onclick="showDetails('john_doe')">View</button>
+                </td>
+            </tr>
+            <tr>
+                <td>admin1</td>
+                <td>admin1@roadportal.com</td>
+                <td><span style="color:green;font-weight:600;">Active</span></td>
+                <td><span class="role">Admin</span></td>
+                <td>2023-11-02</td>
+                <td>0</td>
+                <td class="actions">
+                    <button class="deactivate">Deactivate</button>
+                    <button class="reset">Reset Password</button>
+                    <button class="view" onclick="showDetails('admin1')">View</button>
+                </td>
+            </tr>
+            <tr>
+                <td>jane_smith</td>
+                <td>jane@demo.com</td>
+                <td><span style="color:#ff9800;font-weight:600;">Inactive</span></td>
+                <td><span class="role">Moderator</span></td>
+                <td>2024-02-10</td>
+                <td>2</td>
+                <td class="actions">
+                    <button class="activate">Activate</button>
+                    <button class="reset">Reset Password</button>
+                    <button class="view" onclick="showDetails('jane_smith')">View</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div id="userDetails" class="user-details" style="display:none;">
+        <button onclick="document.getElementById('userDetails').style.display='none'" style="float:right;background:#ccc;color:#222;padding:4px 10px;border-radius:4px;border:none;">Close</button>
+        <h2>User: <span id="detailUsername"></span></h2>
+        <p><b>Email:</b> <span id="detailEmail"></span></p>
+        <p><b>Status:</b> <span id="detailStatus"></span></p>
+        <p><b>Role:</b> <span id="detailRole"></span></p>
+        <p><b>Date Joined:</b> <span id="detailDate"></span></p>
+        <h3>Complaint History</h3>
+        <table class="complaints-table">
+            <thead>
+                <tr><th>ID</th><th>Status</th><th>Date</th><th>Description</th></tr>
+            </thead>
+            <tbody id="complaintHistory">
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+// Mock user data for preview
+const userData = {
+    'john_doe': {
+        email: 'john@example.com', status: 'Active', role: 'User', date: '2024-01-15',
+        complaints: [
+            {id: 101, status: 'Pending', date: '2024-03-01', desc: 'Pothole on Main St.'},
+            {id: 102, status: 'Resolved', date: '2024-03-05', desc: 'Broken streetlight.'},
+            {id: 103, status: 'In Progress', date: '2024-03-10', desc: 'Blocked drain.'},
+            {id: 104, status: 'Pending', date: '2024-03-15', desc: 'Damaged signboard.'},
+            {id: 105, status: 'Resolved', date: '2024-03-20', desc: 'Cracked pavement.'},
+        ]
+    },
+    'admin1': {
+        email: 'admin1@roadportal.com', status: 'Active', role: 'Admin', date: '2023-11-02',
+        complaints: []
+    },
+    'jane_smith': {
+        email: 'jane@demo.com', status: 'Inactive', role: 'Moderator', date: '2024-02-10',
+        complaints: [
+            {id: 201, status: 'Pending', date: '2024-04-01', desc: 'Water logging.'},
+            {id: 202, status: 'Resolved', date: '2024-04-05', desc: 'Fallen tree branch.'},
+        ]
+    }
+};
+function showDetails(username) {
+    const user = userData[username];
+    if (!user) return;
+    document.getElementById('userDetails').style.display = 'block';
+    document.getElementById('detailUsername').textContent = username;
+    document.getElementById('detailEmail').textContent = user.email;
+    document.getElementById('detailStatus').textContent = user.status;
+    document.getElementById('detailRole').textContent = user.role;
+    document.getElementById('detailDate').textContent = user.date;
+    // Complaint history
+    let html = '';
+    for (const c of user.complaints) {
+        html += `<tr><td>${c.id}</td><td>${c.status}</td><td>${c.date}</td><td>${c.desc}</td></tr>`;
+    }
+    document.getElementById('complaintHistory').innerHTML = html || '<tr><td colspan="4">No complaints</td></tr>';
+}
+</script>
+</body>
+</html> 

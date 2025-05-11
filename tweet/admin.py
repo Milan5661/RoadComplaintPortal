@@ -34,6 +34,7 @@ class ComplaintAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         custom_urls = [
             path('report-generation/', self.admin_site.admin_view(self.report_generation_view), name='tweet_complaint_report_generation'),
+            path('report-generation/pdf/', self.admin_site.admin_view(self.report_pdf_view), name='tweet_complaint_report_pdf'),
         ]
         return custom_urls + urls
 
@@ -62,7 +63,50 @@ class ComplaintAdmin(admin.ModelAdmin):
         # Print mode (render printable template)
         if request.GET.get('print'):
             return render(request, 'admin_report_generation.html', {'complaints': qs, 'request': request, 'print_mode': True})
-        return render(request, 'admin_report_generation.html', {'complaints': qs, 'request': request})
+        # PDF download button
+        pdf_url = request.get_full_path().replace('report-generation/', 'report-generation/pdf/')
+        return render(request, 'admin_report_generation.html', {'complaints': qs, 'request': request, 'pdf_url': pdf_url})
+
+    def report_pdf_view(self, request):
+        from django.template.loader import get_template
+        from django.http import HttpResponse
+        from weasyprint import HTML
+        qs = Complaint.objects.all()
+        status = request.GET.get('status')
+        period = request.GET.get('period', 'all')
+        from_date = request.GET.get('from_date')
+        to_date = request.GET.get('to_date')
+        if status:
+            qs = qs.filter(status=status)
+        if period == 'today':
+            today = timezone.now().date()
+            qs = qs.filter(created_at__date=today)
+        elif period == 'week':
+            today = timezone.now().date()
+            start_week = today - datetime.timedelta(days=today.weekday())
+            qs = qs.filter(created_at__date__gte=start_week)
+        elif period == 'month':
+            now = timezone.now()
+            qs = qs.filter(created_at__year=now.year, created_at__month=now.month)
+        elif period == 'custom' and from_date and to_date:
+            qs = qs.filter(created_at__date__gte=from_date, created_at__date__lte=to_date)
+        pending_count = qs.filter(status='Pending').count()
+        in_progress_count = qs.filter(status='In Progress').count()
+        resolved_count = qs.filter(status='Resolved').count()
+        template = get_template('pdf_report.html')
+        html_string = template.render({
+            'complaints': qs,
+            'request': request,
+            'pdf_mode': True,
+            'pending_count': pending_count,
+            'in_progress_count': in_progress_count,
+            'resolved_count': resolved_count,
+        })
+        html = HTML(string=html_string, base_url=request.build_absolute_uri('/'))
+        pdf = html.write_pdf()
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="complaint_report.pdf"'
+        return response
 
     def changelist_view(self, request, extra_context=None):
         if not extra_context:

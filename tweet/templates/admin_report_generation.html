@@ -33,6 +33,9 @@
     <button type="submit" class="btn btn-primary">Generate</button>
     {% if complaints %}
       <a href="?{{ request.GET.urlencode }}&print=1" target="_blank" class="btn btn-secondary">Print</a>
+      {% if pdf_url %}
+        <a href="{{ pdf_url }}" class="btn btn-success" style="margin-left: 8px;">Download PDF</a>
+      {% endif %}
     {% endif %}
   </form>
   <hr>

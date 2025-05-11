@@ -500,3 +500,6 @@ def dashboard(request):
     }
     return render(request, 'dashboard.html', context)
 
+def user_management_preview(request):
+    return render(request, 'user_management_preview.html')
+

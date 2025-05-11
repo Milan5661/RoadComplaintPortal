@@ -1,0 +1,3 @@
+# ... existing code ...
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# For real email, use SMTP backend and configure EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD, EMAIL_USE_TLS/SSL 

@@ -7,6 +7,13 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.urls import reverse
 from accounts.forms import UserRegistrationForm, AdminSecurityQuestionForm, AdminPasswordResetForm
 from .models import CustomUser  # Assuming you have a custom user model for security questions.
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
+from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth.tokens import default_token_generator
+from django.http import HttpResponse
 
 User = get_user_model()
 
@@ -19,7 +26,6 @@ def register(request):
             email = form.cleaned_data["email"]
             password = form.cleaned_data["password"]
 
-            # Check if username or email already exists
             if User.objects.filter(username=username).exists():
                 form.add_error("username", "Username already taken.")
                 return render(request, "register.html", {"form": form})
@@ -28,21 +34,30 @@ def register(request):
                 form.add_error("email", "Email already registered.")
                 return render(request, "register.html", {"form": form})
 
-            # Create the user
-            user = User.objects.create_user(username=username, email=email, password=password)
-            # Save security questions/answers to CustomUser fields
+            # Create the user as inactive
+            user = User.objects.create_user(username=username, email=email, password=password, is_active=False)
             user.security_question_1 = "What is your favourite food?"
             user.security_answer_1 = form.cleaned_data["security_answer_1"]
             user.security_question_2 = "What is your pet name?"
             user.security_answer_2 = form.cleaned_data["security_answer_2"]
             user.save()
-            messages.success(request, "Account created successfully. You can now log in.")
+
+            # Send activation email
+            current_site = get_current_site(request)
+            subject = 'Activate Your Road Complaint Portal Account'
+            message = render_to_string('accounts/activation_email.html', {
+                'user': user,
+                'domain': current_site.domain,
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': default_token_generator.make_token(user),
+            })
+            send_mail(subject, message, None, [user.email], fail_silently=False)
+            messages.success(request, "Account created! Please check your email to activate your account.")
             return redirect("login")
         else:
-            # Form validation failed
             return render(request, "register.html", {"form": form})
     else:
-        form = UserRegistrationForm()  # Initialize an empty form
+        form = UserRegistrationForm()
     return render(request, "register.html", {"form": form})
 
 # Custom login view with failed attempt tracking
@@ -145,4 +160,18 @@ def security_questions_view(request):
         except User.DoesNotExist:
             user_obj = None
     return render(request, "security_questions.html", {"user_obj": user_obj, "username": username})
+
+def activate(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        messages.success(request, 'Your account has been activated! You can now log in.')
+        return redirect('login')
+    else:
+        return HttpResponse('Activation link is invalid!')
 

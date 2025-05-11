@@ -17,6 +17,130 @@
     
     <!-- Animate.css for page animations -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    
+    <style>
+        .footer {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #ffffff;
+            padding: 3rem 0;
+            margin-top: auto;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            pointer-events: none;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .footer-section h3 {
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 2px;
+            background: #00ff88;
+        }
+        
+        .footer-section p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .social-links a {
+            color: #ffffff;
+            font-size: 1.8rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            display: inline-block;
+            padding: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .social-links a:hover {
+            color: #00ff88;
+            transform: translateY(-5px) rotate(360deg);
+            background: rgba(255,255,255,0.2);
+            box-shadow: 0 5px 15px rgba(0,255,136,0.3);
+        }
+        
+        .contact-info i {
+            margin-right: 0.8rem;
+            color: #00ff88;
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .contact-info p:hover i {
+            transform: scale(1.2);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .footer-bottom p {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .footer-section h3::after {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            .social-links {
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body class="d-flex flex-column min-vh-100" style="font-family: 'Roboto', sans-serif; margin: 0; padding: 0; overflow-y: scroll;">
     {% include 'navbar.html' %}  
@@ -26,8 +150,36 @@
             {% block content %}{% endblock %}
         </main>
 
-        <footer class="bg-dark text-white text-center py-3 mt-auto animate__animated animate__fadeInUp">
-            <p align="center">&copy; 2025 Road Complaint Portal. All Rights Reserved.</p>
+        <footer class="footer animate__animated animate__fadeInUp">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About Us</h3>
+                    <p>Road Complaint Portal is dedicated to improving road conditions and making our communities safer through citizen engagement and efficient complaint management.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <div class="contact-info">
+                        <p><i class="fas fa-map-marker-alt"></i> 123 Main Street, City, Country</p>
+                        <p><i class="fas fa-phone"></i> +1 234 567 8900</p>
+                        <p><i class="fas fa-envelope"></i> info@roadcomplaintportal.com</p>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Follow Us</h3>
+                    <div class="social-links">
+                        <a href="#" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Road Complaint Portal. All Rights Reserved.</p>
+            </div>
         </footer>
     </div>
 

@@ -144,11 +144,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </section>
 
 <!-- Contact Section -->
-<section class="contact">
-    <h2>Need Help?</h2>
-    <p>Contact us for support or inquiries.</p>
-    <a href="mailto:support@roadcomplaint.com" class="btn btn-secondary">Contact Support</a>
-</section>
+<!-- Removed 'Need Help?' section as requested -->
 
 <!-- Linking CSS and JS -->
 <!-- Font Awesome for icons -->
@@ -201,8 +197,19 @@ document.addEventListener('DOMContentLoaded', function() {
     animateCounter('pendingComplaints', parseInt('{{ pending_complaints|default:0 }}', 10));
     animateCounter('resolvedComplaints', parseInt('{{ resolved_complaints|default:0 }}', 10));
 
-    // 7 Days Complaints Bar Chart
+    // --- 7 Days Complaints Bar Chart ---
     const ctxBar = document.getElementById('complaints7DaysBarChart').getContext('2d');
+    // Create gradients for each bar
+    const gradOrange = ctxBar.createLinearGradient(0, 0, 0, 300);
+    gradOrange.addColorStop(0, "#ffe29f");
+    gradOrange.addColorStop(1, "#ffb347");
+    const gradBlue = ctxBar.createLinearGradient(0, 0, 0, 300);
+    gradBlue.addColorStop(0, "#a1c4fd");
+    gradBlue.addColorStop(1, "#2196f3");
+    const gradGreen = ctxBar.createLinearGradient(0, 0, 0, 300);
+    gradGreen.addColorStop(0, "#b2f7c1");
+    gradGreen.addColorStop(1, "#43e97b");
+
     new Chart(ctxBar, {
         type: 'bar',
         data: {
@@ -214,36 +221,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     parseInt("{{ complaints_7d_in_progress|default:0 }}", 10),
                     parseInt("{{ complaints_7d_resolved|default:0 }}", 10)
                 ],
-                backgroundColor: [
-                    'rgba(255,152,0,0.85)',  // orange
-                    'rgba(33,150,243,0.85)', // blue
-                    'rgba(76,175,80,0.85)'   // green
-                ],
-                borderColor: [
-                    'rgba(255,152,0,1)',
-                    'rgba(33,150,243,1)',
-                    'rgba(76,175,80,1)'
-                ],
+                backgroundColor: [gradOrange, gradBlue, gradGreen],
+                borderRadius: 16,
+                borderSkipped: false,
                 borderWidth: 2,
                 barThickness: 'flex',
-                maxBarThickness: 35
+                maxBarThickness: 40,
+                hoverBackgroundColor: ['#ffb347', '#2196f3', '#43e97b'],
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            layout: {
-                padding: {
-                    left: 10,
-                    right: 10,
-                    top: 0,
-                    bottom: 10
-                }
-            },
             plugins: {
-                legend: {
-                    display: false
-                },
+                legend: { display: false },
                 tooltip: {
                     enabled: true,
                     mode: 'index',
@@ -256,39 +247,58 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             },
+            animation: {
+                duration: 1200,
+                easing: 'easeOutBounce'
+            },
             scales: {
                 y: {
                     beginAtZero: true,
                     title: {
                         display: true,
                         text: 'Number of Complaints',
-                        font: {
-                            size: 11
-                        }
+                        font: { size: 13, weight: 'bold' }
                     },
-                    ticks: {
-                        font: {
-                            size: 10
-                        }
-                    }
+                    ticks: { font: { size: 12 } },
+                    grid: { color: '#e0eaff' }
                 },
                 x: {
-                    title: {
-                        display: false
-                    },
-                    ticks: {
-                        font: {
-                            size: 10
-                        }
-                    }
+                    ticks: { font: { size: 12 } },
+                    grid: { display: false }
                 }
             }
-        }
+        },
+        plugins: [{
+            // Drop shadow plugin for bars
+            beforeDraw: chart => {
+                const ctx = chart.ctx;
+                ctx.save();
+                ctx.shadowColor = 'rgba(33,150,243,0.18)';
+                ctx.shadowBlur = 16;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 8;
+            },
+            afterDraw: chart => {
+                chart.ctx.restore();
+            }
+        }]
     });
-    // All-Time Complaints Pie Chart
+
+    // --- All-Time Complaints Pie Chart (Donut) ---
     const ctxPie = document.getElementById('allTimePieChart').getContext('2d');
+    // Gradients for pie segments
+    const pieGrad1 = ctxPie.createLinearGradient(0, 0, 300, 0);
+    pieGrad1.addColorStop(0, "#ffe29f");
+    pieGrad1.addColorStop(1, "#ffb347");
+    const pieGrad2 = ctxPie.createLinearGradient(0, 0, 0, 300);
+    pieGrad2.addColorStop(0, "#a1c4fd");
+    pieGrad2.addColorStop(1, "#2196f3");
+    const pieGrad3 = ctxPie.createLinearGradient(0, 0, 300, 300);
+    pieGrad3.addColorStop(0, "#b2f7c1");
+    pieGrad3.addColorStop(1, "#43e97b");
+
     new Chart(ctxPie, {
-        type: 'pie',
+        type: 'doughnut',
         data: {
             labels: ['Pending', 'In Progress', 'Resolved'],
             datasets: [{
@@ -297,21 +307,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     parseInt("{{ in_progress_complaints|default:0 }}", 10),
                     parseInt("{{ resolved_complaints|default:0 }}", 10)
                 ],
-                backgroundColor: [
-                    'rgba(255,152,0,0.85)',  // orange
-                    'rgba(33,150,243,0.85)', // blue
-                    'rgba(76,175,80,0.85)'   // green
-                ],
-                borderColor: [
-                    'rgba(255,152,0,1)',
-                    'rgba(33,150,243,1)',
-                    'rgba(76,175,80,1)'
-                ],
+                backgroundColor: [pieGrad1, pieGrad2, pieGrad3],
                 borderWidth: 2,
-                radius: '80%'
+                borderColor: "#fff",
+                hoverOffset: 16
             }]
         },
         options: {
+            cutout: '70%',
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
@@ -319,9 +322,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     display: true,
                     position: 'bottom',
                     labels: {
-                        boxWidth: 12,
-                        padding: 10,
-                        font: { size: 12 }
+                        boxWidth: 18,
+                        padding: 16,
+                        font: { size: 15, weight: 'bold' },
+                        color: '#2a5298'
                     }
                 },
                 tooltip: {
@@ -333,8 +337,27 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                 }
+            },
+            animation: {
+                animateRotate: true,
+                duration: 1400,
+                easing: 'easeOutElastic'
             }
-        }
+        },
+        plugins: [{
+            // Drop shadow for donut
+            beforeDraw: chart => {
+                const ctx = chart.ctx;
+                ctx.save();
+                ctx.shadowColor = 'rgba(33,150,243,0.18)';
+                ctx.shadowBlur = 24;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 8;
+            },
+            afterDraw: chart => {
+                chart.ctx.restore();
+            }
+        }]
     });
 });
 </script>

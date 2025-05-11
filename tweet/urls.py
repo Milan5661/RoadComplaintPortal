@@ -35,4 +35,6 @@ urlpatterns = [
     path('api/complaints/json/', get_complaints, name='get_complaints'),  # JSON for map or frontend
     path('api/complaints/', ComplaintListCreateView.as_view(), name='complaints_api'),  # DRF API for complaints
 
+    # Preview User Management Dashboard
+    path('preview/', views.user_management_preview, name='user_management_preview'),
 ]

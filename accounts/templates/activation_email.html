@@ -1,0 +1,14 @@
+Subject: Activate your Road Complaint Portal account
+
+Hi {{ user.username }},
+
+Thank you for registering at Road Complaint Portal!
+
+Please click the link below to activate your account:
+
+http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+
+If you did not register, please ignore this email.
+
+Best regards,
+Road Complaint Portal Team 

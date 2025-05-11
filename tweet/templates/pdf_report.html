@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Complaint Report PDF</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #fff; color: #222; }
+        .container { max-width: 900px; margin: 2rem auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #0001; padding: 2rem; }
+        h1 { font-size: 2rem; font-weight: 600; margin-bottom: 1.5rem; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+        th { background: #f5f5f5; }
+        .mb-4 { margin-bottom: 1.5rem; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Complaint Report</h1>
+    <div class="mb-4">
+        <h4>Analytics Summary</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Pending</td>
+                    <td>{{ pending_count }}</td>
+                </tr>
+                <tr>
+                    <td>In Progress</td>
+                    <td>{{ in_progress_count }}</td>
+                </tr>
+                <tr>
+                    <td>Resolved</td>
+                    <td>{{ resolved_count }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% if complaints %}
+        <h3>Report Results ({{ complaints|length }})</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Status</th>
+                    <th>Is Approved</th>
+                    <th>Created At</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in complaints %}
+                <tr>
+                    <td>{{ c.user }}</td>
+                    <td>{{ c.status }}</td>
+                    <td>{{ c.is_approved|yesno:"✔,✖" }}</td>
+                    <td>{{ c.created_at|date:'M d, Y H:i' }}</td>
+                    <td>{{ c.description|truncatechars:50 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No complaints found for the selected criteria.</p>
+    {% endif %}
+</div>
+</body>
+</html> 
