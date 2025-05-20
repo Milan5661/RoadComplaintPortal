@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Registration - Road Complaint Portal{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="auth-form" style="max-width:410px; margin:40px auto 0 auto; padding:32px 32px 24px 32px; background:#fff; border-radius:12px; box-shadow:0 4px 32px #0001;">
+        <h2>Admin Registration</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" id="admin-register-form" autocomplete="off">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" name="username" id="username" required class="form-control" value="{{ form.username.value|default_if_none:'' }}">
+                {% if form.username.errors %}
+                    <div class="alert alert-warning">{{ form.username.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" name="email" id="email" required class="form-control" value="{{ form.email.value|default_if_none:'' }}">
+                {% if form.email.errors %}
+                    <div class="alert alert-warning">{{ form.email.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" required class="form-control">
+                {% if form.password.errors %}
+                    <div class="alert alert-warning">{{ form.password.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" name="confirm_password" id="confirm_password" required class="form-control">
+                {% if form.confirm_password.errors %}
+                    <div class="alert alert-warning">{{ form.confirm_password.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="security_answer_1">What is your favourite food?</label>
+                <input type="text" name="security_answer_1" id="security_answer_1" required class="form-control" value="{{ form.security_answer_1.value|default_if_none:'' }}">
+                {% if form.security_answer_1.errors %}
+                    <div class="alert alert-warning">{{ form.security_answer_1.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="security_answer_2">What is your childhood name?</label>
+                <input type="text" name="security_answer_2" id="security_answer_2" required class="form-control" value="{{ form.security_answer_2.value|default_if_none:'' }}">
+                {% if form.security_answer_2.errors %}
+                    <div class="alert alert-warning">{{ form.security_answer_2.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Register as Admin</button>
+        </form>
+        <p class="mt-3 text-center">
+            Already have an account? <a href="{% url 'login' %}">Login here</a>
+        </p>
+    </div>
+</div>
+{% endblock %} 

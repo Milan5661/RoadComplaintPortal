@@ -1,0 +1,81 @@
+@startuml Road Complaint Portal ER Diagram
+
+' Styling
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+
+skinparam note {
+    BackgroundColor LightYellow
+    BorderColor Gray
+}
+
+!define table(x) class x << (T,#FFAAAA) >>
+!define primary_key(x) <u>x</u>
+!define foreign_key(x) #x#
+!define required(x) <b>x</b>
+
+' Entity definitions
+table(User) {
+    primary_key(id): integer
+    required(username): varchar(150)
+    required(email): varchar(254)
+    required(password): varchar(128)
+    is_active: boolean
+    date_joined: datetime
+    last_login: datetime
+    is_staff: boolean
+    is_superuser: boolean
+}
+
+table(Complaint) {
+    primary_key(id): integer
+    foreign_key(user_id): integer
+    required(description): text
+    address: varchar(255)
+    required(created_at): datetime
+    is_approved: boolean
+    required(status): varchar(20)
+    latitude: float
+    longitude: float
+}
+
+table(ComplaintImage) {
+    primary_key(id): integer
+    foreign_key(complaint_id): integer
+    required(image): image
+    uploaded_at: datetime
+}
+
+' Relationships
+User "1" -- "0..*" Complaint : submits >
+Complaint "1" -- "1..4" ComplaintImage : has >
+
+' Notes
+note bottom of User
+  Django's built-in User model
+  Used for authentication and
+  user management
+end note
+
+note bottom of Complaint
+  Status choices:
+  - Pending (default)
+  - In Progress
+  - Resolved
+  
+  Location tracking:
+  - Latitude/Longitude for
+    map visualization
+end note
+
+note bottom of ComplaintImage
+  Constraints:
+  - Maximum 4 images per complaint
+  - Minimum 1 image required
+  - Supports common image formats
+end note
+
+@enduml 

@@ -17,6 +17,8 @@ class ComplaintForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         images = self.files.getlist('images') if hasattr(self, 'files') else []
+        if len(images) < 1:
+            raise ValidationError('You must upload at least one image per complaint.')
         if len(images) > 4:
             raise ValidationError('You can upload a maximum of 4 images per complaint.')
         return cleaned_data
@@ -24,7 +26,7 @@ class ComplaintForm(forms.ModelForm):
 # UserRegistrationForm (Form)
 class UserRegistrationForm(forms.Form):
     username = forms.CharField(max_length=150, required=True, help_text="Pick a unique username.")
-    email = forms.EmailField(validators=[EmailValidator()])
+    email = forms.EmailField(required=True)  # Basic email field without validation
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
         min_length=8,
@@ -39,12 +41,6 @@ class UserRegistrationForm(forms.Form):
     )
     security_answer_1 = forms.CharField(max_length=100, required=True, label="What is your favourite food?")
     security_answer_2 = forms.CharField(max_length=100, required=True, label="What is your childhood name?")
-
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if not re.match(r'^[a-zA-Z0-9_.+-]+@gmail\.com$', email):
-            raise ValidationError("Please enter a valid Gmail address.")
-        return email
 
     def clean_password(self):
         password = self.cleaned_data.get('password')
@@ -102,20 +98,43 @@ class UserPasswordResetForm(forms.Form):
     new_password = forms.CharField(
             label="New Password",
             widget=forms.PasswordInput(),
-            min_length=6,
-            help_text="Password must be at least 6 characters."
+            min_length=8,
+            max_length=15,
+            help_text="Password must be 8-15 characters, include a number, an uppercase and a lowercase letter."
         )
     confirm_password = forms.CharField(
             label="Confirm Password",
             widget=forms.PasswordInput(),
-            min_length=6,
+            min_length=8,
+            max_length=15,
             help_text="Enter the same password as before, for verification."
         )
+
+    def clean_new_password(self):
+        password = self.cleaned_data.get('new_password')
+        errors = []
+        if not password:
+            errors.append("Password is required.")
+        if password:
+            if len(password) < 8 or len(password) > 15:
+                errors.append("Password must be between 8 and 15 characters long.")
+            if not re.search(r'[A-Z]', password):
+                errors.append("Password must contain at least one uppercase letter.")
+            if not re.search(r'[a-z]', password):
+                errors.append("Password must contain at least one lowercase letter.")
+            if not re.search(r'\\d', password):
+                errors.append("Password must contain at least one number.")
+        if errors:
+            raise ValidationError(errors)
+        return password
 
     def clean(self):
         cleaned_data = super().clean()
         new_password = cleaned_data.get("new_password")
         confirm_password = cleaned_data.get("confirm_password")
+        # Validate password strength
+        if new_password:
+            self.cleaned_data['new_password'] = self.clean_new_password()
         if new_password and confirm_password and new_password != confirm_password:
             raise forms.ValidationError("Passwords do not match.")
         return cleaned_data
@@ -151,5 +170,67 @@ class AdminPasswordResetForm(forms.Form):
         new_password = cleaned_data.get("new_password")
         confirm_password = cleaned_data.get("confirm_password")
         if new_password and confirm_password and new_password != confirm_password:
+            raise forms.ValidationError("Passwords do not match.")
+        return cleaned_data
+
+class AdminRegistrationForm(forms.Form):
+    username = forms.CharField(
+        max_length=150,
+        required=True,
+        help_text="Pick a unique username.",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={'class': 'form-control'})
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        min_length=8,
+        max_length=15,
+        help_text="Password must be 8-15 characters, include a number, an uppercase and a lowercase letter."
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        min_length=8,
+        max_length=15,
+        help_text="Re-enter your password."
+    )
+    security_answer_1 = forms.CharField(
+        max_length=100,
+        required=True,
+        label="What is your favourite food?",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your answer'})
+    )
+    security_answer_2 = forms.CharField(
+        max_length=100,
+        required=True,
+        label="What is your childhood name?",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your answer'})
+    )
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        errors = []
+        if not password:
+            errors.append("Password is required.")
+        if password:
+            if len(password) < 8 or len(password) > 15:
+                errors.append("Password must be between 8 and 15 characters long.")
+            if not re.search(r'[A-Z]', password):
+                errors.append("Password must contain at least one uppercase letter.")
+            if not re.search(r'[a-z]', password):
+                errors.append("Password must contain at least one lowercase letter.")
+            if not re.search(r'\d', password):
+                errors.append("Password must contain at least one number.")
+        if errors:
+            raise ValidationError(errors)
+        return password
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get('password')
+        confirm_password = cleaned_data.get('confirm_password')
+        if password and confirm_password and password != confirm_password:
             raise forms.ValidationError("Passwords do not match.")
         return cleaned_data

@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from rest_framework import generics
@@ -17,6 +17,11 @@ import random
 import re
 from django.core.paginator import Paginator
 from collections import Counter
+from django.db.models import Count
+from django.db.models.functions import TruncMonth
+from django.db.models import Q
+import hashlib
+from django.conf import settings
 # ----------------- Static Pages -------------
 
 from django.contrib.admin.views.decorators import staff_member_required
@@ -241,6 +246,31 @@ def password_reset(request):
 from django.utils import timezone
 from datetime import timedelta
 
+def admin_login(request):
+    # Get admin credentials from URL parameters
+    admin_username = request.GET.get('admin')
+    admin_token = request.GET.get('token')
+    
+    if not admin_username or not admin_token:
+        return HttpResponseForbidden("Access Denied")
+    
+    # Generate expected token (you should change this secret key)
+    secret_key = settings.SECRET_KEY
+    expected_token = hashlib.sha256(f"{admin_username}{secret_key}".encode()).hexdigest()
+    
+    if admin_token != expected_token:
+        return HttpResponseForbidden("Invalid Token")
+    
+    try:
+        user = User.objects.get(username=admin_username, is_staff=True)
+        if user.is_active:
+            login(request, user)
+            return redirect('dashboard')
+        else:
+            return HttpResponseForbidden("Account is disabled")
+    except User.DoesNotExist:
+        return HttpResponseForbidden("Admin user not found")
+
 def home(request):
     from django.db.models import Q
     # Get filter parameters from request
@@ -390,44 +420,6 @@ def register(request):
 # ----------------- Complaint Related -----------------
 
 @login_required
-def submit_complaint(request):
-    if request.method == "POST":
-        description = request.POST.get("description")
-        address = request.POST.get("address")
-        latitude = request.POST.get("latitude")
-        longitude = request.POST.get("longitude")
-
-        # Ensure coordinates are present and valid
-        error = None
-        try:
-            latitude = float(latitude)
-            longitude = float(longitude)
-        except (TypeError, ValueError):
-            error = "Could not determine your location. Please use the 'Use My Current Location' button."
-
-        if not description or error:
-            return render(request, "complaint_form.html", {"error": error or "All fields are required."})
-
-        complaint = Complaint(
-            user=request.user,
-            description=description,
-            address=address,
-            latitude=latitude,
-            longitude=longitude
-        )
-        complaint.save()
-
-        # Handle multiple images
-        images = request.FILES.getlist('images')
-        from .models import ComplaintImage
-        for image in images:
-            ComplaintImage.objects.create(complaint=complaint, image=image)
-
-        return redirect('my_complaints')
-
-    return render(request, "complaint_form.html")
-
-@login_required
 def complaint_form(request):
     form = ComplaintForm()
     if request.method == "POST":
@@ -443,8 +435,9 @@ def complaint_form(request):
             for image in images:
                 ComplaintImage.objects.create(complaint=complaint, image=image)
 
-            # Send email
-            
+            # Set success message and redirect
+            messages.success(request, "Report completed successfully! Your complaint has been submitted.")
+            return redirect('tweet:my_complaints')
         else:
             messages.error(request, "Error submitting complaint. Please try again.")
     return render(request, "complaint_form.html", {"form": form})
@@ -492,14 +485,213 @@ def dashboard(request):
     total_complaints = Complaint.objects.filter(is_approved=True).count()
     resolved_complaints = Complaint.objects.filter(is_approved=True, status='Resolved').count()
     pending_complaints = Complaint.objects.filter(is_approved=True, status='Pending').count()
+    in_progress_complaints = Complaint.objects.filter(is_approved=True, status='In Progress').count()
+
+    # Get complaints by status for the last 30 days
+    thirty_days_ago = timezone.now() - datetime.timedelta(days=30)
+    recent_complaints = Complaint.objects.filter(
+        is_approved=True,
+        created_at__gte=thirty_days_ago
+    ).order_by('-created_at')[:5]
+
+    # Get complaints by location (top 5 areas)
+    location_stats = Complaint.objects.filter(is_approved=True).values('address').annotate(
+        count=Count('id')
+    ).order_by('-count')[:5]
+
+    # Get monthly trend
+    monthly_trend = Complaint.objects.filter(
+        is_approved=True,
+        created_at__gte=timezone.now() - datetime.timedelta(days=365)
+    ).annotate(
+        month=TruncMonth('created_at')
+    ).values('month').annotate(
+        count=Count('id')
+    ).order_by('month')
 
     context = {
         'total_complaints': total_complaints,
         'resolved_complaints': resolved_complaints,
         'pending_complaints': pending_complaints,
+        'in_progress_complaints': in_progress_complaints,
+        'recent_complaints': recent_complaints,
+        'location_stats': location_stats,
+        'monthly_trend': monthly_trend,
+        'resolution_rate': (resolved_complaints / total_complaints * 100) if total_complaints > 0 else 0,
     }
     return render(request, 'dashboard.html', context)
 
 def user_management_preview(request):
     return render(request, 'user_management_preview.html')
+
+@staff_member_required
+def user_management(request):
+    users = User.objects.all().order_by('-date_joined')
+    search_query = request.GET.get('search', '')
+    status_filter = request.GET.get('status', '')
+    role_filter = request.GET.get('role', '')
+
+    if search_query:
+        users = users.filter(
+            Q(username__icontains=search_query) |
+            Q(email__icontains=search_query)
+        )
+
+    if status_filter:
+        if status_filter == 'active':
+            users = users.filter(is_active=True)
+        elif status_filter == 'inactive':
+            users = users.filter(is_active=False)
+
+    if role_filter:
+        if role_filter == 'admin':
+            users = users.filter(is_staff=True)
+        elif role_filter == 'user':
+            users = users.filter(is_staff=False)
+
+    # Get user statistics
+    total_users = users.count()
+    active_users = users.filter(is_active=True).count()
+    admin_users = users.filter(is_staff=True).count()
+    regular_users = users.filter(is_staff=False).count()
+
+    # Get user activity stats (complaints filed)
+    user_activity = {}
+    for user in users:
+        complaint_count = Complaint.objects.filter(user=user).count()
+        user_activity[user.id] = complaint_count
+
+    context = {
+        'users': users,
+        'total_users': total_users,
+        'active_users': active_users,
+        'admin_users': admin_users,
+        'regular_users': regular_users,
+        'user_activity': user_activity,
+        'search_query': search_query,
+        'status_filter': status_filter,
+        'role_filter': role_filter,
+    }
+    return render(request, 'user_management.html', context)
+
+@staff_member_required
+def toggle_user_status(request, user_id):
+    if request.method == 'POST':
+        try:
+            user = User.objects.get(id=user_id)
+            user.is_active = not user.is_active
+            user.save()
+            messages.success(request, f"User {user.username} has been {'activated' if user.is_active else 'deactivated'}.")
+        except User.DoesNotExist:
+            messages.error(request, "User not found.")
+    return redirect('user_management')
+
+@staff_member_required
+def reset_user_password(request, user_id):
+    if request.method == 'POST':
+        try:
+            user = User.objects.get(id=user_id)
+            new_password = User.objects.make_random_password()
+            user.set_password(new_password)
+            user.save()
+            
+            # Send email with new password
+            send_mail(
+                'Password Reset - Road Complaint Portal',
+                f'Your password has been reset. Your new password is: {new_password}\n\nPlease change your password after logging in.',
+                'noreply@roadcomplaintportal.com',
+                [user.email],
+                fail_silently=False,
+            )
+            messages.success(request, f"Password has been reset for {user.username}. An email has been sent.")
+        except User.DoesNotExist:
+            messages.error(request, "User not found.")
+    return redirect('user_management')
+
+@staff_member_required
+def complaint_management(request):
+    complaints = Complaint.objects.all().order_by('-created_at')
+    search_query = request.GET.get('search', '')
+    status_filter = request.GET.get('status', '')
+    date_filter = request.GET.get('date', '')
+
+    if search_query:
+        complaints = complaints.filter(
+            Q(title__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(address__icontains=search_query)
+        )
+
+    if status_filter:
+        complaints = complaints.filter(status=status_filter)
+
+    if date_filter:
+        if date_filter == 'today':
+            today = timezone.now().date()
+            complaints = complaints.filter(created_at__date=today)
+        elif date_filter == 'week':
+            today = timezone.now().date()
+            start_week = today - datetime.timedelta(days=today.weekday())
+            complaints = complaints.filter(created_at__date__gte=start_week)
+        elif date_filter == 'month':
+            now = timezone.now()
+            complaints = complaints.filter(created_at__year=now.year, created_at__month=now.month)
+
+    # Get complaint statistics
+    total_complaints = complaints.count()
+    pending_complaints = complaints.filter(status='Pending').count()
+    in_progress_complaints = complaints.filter(status='In Progress').count()
+    resolved_complaints = complaints.filter(status='Resolved').count()
+
+    # Get monthly trend
+    monthly_trend = complaints.annotate(
+        month=TruncMonth('created_at')
+    ).values('month').annotate(
+        count=Count('id')
+    ).order_by('month')
+
+    context = {
+        'complaints': complaints,
+        'total_complaints': total_complaints,
+        'pending_complaints': pending_complaints,
+        'in_progress_complaints': in_progress_complaints,
+        'resolved_complaints': resolved_complaints,
+        'monthly_trend': monthly_trend,
+        'search_query': search_query,
+        'status_filter': status_filter,
+        'date_filter': date_filter,
+    }
+    return render(request, 'complaint_management.html', context)
+
+@staff_member_required
+def reports(request):
+    from django.db.models.functions import TruncMonth
+    from django.db.models import Count
+    from .models import Complaint
+    from django.utils import timezone
+    import datetime
+
+    # Complaint stats
+    total_complaints = Complaint.objects.count()
+    pending_complaints = Complaint.objects.filter(status='Pending').count()
+    in_progress_complaints = Complaint.objects.filter(status='In Progress').count()
+    resolved_complaints = Complaint.objects.filter(status='Resolved').count()
+
+    # Monthly trend (last 12 months)
+    twelve_months_ago = timezone.now() - datetime.timedelta(days=365)
+    monthly_trend = Complaint.objects.filter(created_at__gte=twelve_months_ago)
+    monthly_trend = monthly_trend.annotate(month=TruncMonth('created_at')).values('month').annotate(count=Count('id')).order_by('month')
+
+    # Recent complaints
+    recent_complaints = Complaint.objects.order_by('-created_at')[:10]
+
+    context = {
+        'total_complaints': total_complaints,
+        'pending_complaints': pending_complaints,
+        'in_progress_complaints': in_progress_complaints,
+        'resolved_complaints': resolved_complaints,
+        'monthly_trend': list(monthly_trend),
+        'recent_complaints': recent_complaints,
+    }
+    return render(request, 'reports.html', context)
 

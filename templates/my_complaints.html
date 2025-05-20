@@ -4,6 +4,12 @@
 {% block content %}
 
 
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} complaint-success-message">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
 <div class="view-complaints-stack" style="display: flex; flex-direction: column; align-items: center; gap: 32px; margin: 32px auto; padding: 0 16px; width: 100%; max-width: 1200px; box-sizing: border-box;">
   <h2 class="mb-4 text-center">My Complaints</h2>
   {% if complaints %}
@@ -110,5 +116,11 @@ function closeImage(complaintId) {
   modal.style.display = 'none';
   modalImg.src = '';
 }
+
+setTimeout(function() {
+  document.querySelectorAll('.complaint-success-message').forEach(function(msg) {
+    msg.style.display = 'none';
+  });
+}, 4000);
 </script>
 {% endblock %}

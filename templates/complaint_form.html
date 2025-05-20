@@ -3,9 +3,25 @@
 
 {% block content %}
 <div class="complaint-container">
-    <div class="complaint-card">
+    {% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+{% if error %}
+  <div class="alert alert-error">{{ error }}</div>
+{% endif %}
+<div class="complaint-card">
         <h2 class="complaint-title">Submit a Road Complaint</h2>
         
+        <!-- Show non-field errors -->
+        {% if form.non_field_errors %}
+          <div class="alert alert-error">
+            {% for error in form.non_field_errors %}
+              {{ error }}<br>
+            {% endfor %}
+          </div>
+        {% endif %}
         <form id="complaintForm" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             
@@ -23,7 +39,6 @@
                 <button type="button" class="location-btn" id="getLocationBtn">
                     <i class="fas fa-map-marker-alt"></i> Use My Current Location
                 </button>
-                <small class="text-muted d-block mt-2">You will be asked to allow location access by your browser. Please accept for best accuracy.</small>
                 <script>
                     document.getElementById('getLocationBtn').onclick = function() {
                         if (navigator.geolocation) {
@@ -53,7 +68,7 @@
             <div class="file-upload">
                 <label for="images">
                     <i class="fas fa-camera"></i> Upload Images
-                    <p class="text-muted">(Optional) Add one or more photos of the issue</p>
+                    <p class="text-muted">(Required) Add at least one and at most four photos of the issue</p>
                 </label>
                 <input type="file" id="images" name="images" accept="image/*" multiple onchange="validateImageCount(event); previewImages(event)">
 <div id="image-error" class="image-error-message" style="display:none;"></div>

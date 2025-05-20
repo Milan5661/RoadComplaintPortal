@@ -17,6 +17,7 @@ urlpatterns = [
     # Admin Security Questions & Password Reset at root (no /admin/ prefix to avoid conflict)
     path('admin-set-security-questions/', tweet_views.set_admin_security_questions, name='set_admin_security_questions'),
     path('admin-password-reset/', tweet_views.admin_password_reset, name='admin_password_reset'),
+    path('admin-register/', accounts_views.admin_register, name='admin_register'),
 
 
     # Accounts-related

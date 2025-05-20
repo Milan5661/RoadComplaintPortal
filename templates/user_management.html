@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}User Management{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-5" style="font-weight: bold; font-size: 2.5rem;">User Management</h1>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center shadow p-4 rounded-4 border-0 bg-light h-100 dashboard-card">
+                <div class="card-body">
+                    <i class="fas fa-users fa-3x mb-3 text-primary"></i>
+                    <h2 class="counter mb-2" style="font-size: 2.5rem;">{{ total_users }}</h2>
+                    <p class="mb-0" style="font-weight: bold;">Total Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow p-4 rounded-4 border-0 bg-light h-100 dashboard-card">
+                <div class="card-body">
+                    <i class="fas fa-user-check fa-3x mb-3 text-success"></i>
+                    <h2 class="counter mb-2" style="font-size: 2.5rem;">{{ active_users }}</h2>
+                    <p class="mb-0" style="font-weight: bold;">Active Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow p-4 rounded-4 border-0 bg-light h-100 dashboard-card">
+                <div class="card-body">
+                    <i class="fas fa-user-shield fa-3x mb-3 text-info"></i>
+                    <h2 class="counter mb-2" style="font-size: 2.5rem;">{{ admin_users }}</h2>
+                    <p class="mb-0" style="font-weight: bold;">Admin Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow p-4 rounded-4 border-0 bg-light h-100 dashboard-card">
+                <div class="card-body">
+                    <i class="fas fa-user fa-3x mb-3 text-warning"></i>
+                    <h2 class="counter mb-2" style="font-size: 2.5rem;">{{ regular_users }}</h2>
+                    <p class="mb-0" style="font-weight: bold;">Regular Users</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card shadow p-4 rounded-4 border-0 mb-4">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" class="form-control" name="search" placeholder="Search by username or email" value="{{ search_query }}">
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" name="status">
+                    <option value="">All Statuses</option>
+                    <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" name="role">
+                    <option value="">All Roles</option>
+                    <option value="admin" {% if role_filter == 'admin' %}selected{% endif %}>Admin</option>
+                    <option value="user" {% if role_filter == 'user' %}selected{% endif %}>Regular User</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card shadow p-4 rounded-4 border-0">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Role</th>
+                        <th>Date Joined</th>
+                        <th>Complaints</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            <span class="badge {% if user.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ user.is_active|yesno:"Active,Inactive" }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge {% if user.is_staff %}bg-info{% else %}bg-secondary{% endif %}">
+                                {{ user.is_staff|yesno:"Admin,User" }}
+                            </span>
+                        </td>
+                        <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                        <td>{{ user_activity|get_item:user.id }}</td>
+                        <td>
+                            <div class="btn-group">
+                                <form method="post" action="{% url 'toggle_user_status' user.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm {% if user.is_active %}btn-warning{% else %}btn-success{% endif %}">
+                                        {{ user.is_active|yesno:"Deactivate,Activate" }}
+                                    </button>
+                                </form>
+                                <form method="post" action="{% url 'reset_user_password' user.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-info">Reset Password</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<!-- Counter Animation -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function animateCounter(element, end) {
+        let start = 0;
+        let duration = 1500;
+        let increment = end / (duration / 40);
+        
+        let timer = setInterval(function() {
+            start += increment;
+            if (start >= end) {
+                start = end;
+                clearInterval(timer);
+            }
+            element.innerText = Math.floor(start);
+        }, 40);
+    }
+
+    document.querySelectorAll('.counter').forEach(counter => {
+        animateCounter(counter, parseInt(counter.innerText));
+    });
+});
+</script>
+{% endblock %} 

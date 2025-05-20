@@ -40,8 +40,26 @@ document.addEventListener("DOMContentLoaded", function() {
 
 </style>
 {% block content %}
-<!-- Dashboard Section -->
-<!-- Hero Section -->
+<div class="container" style="position:relative;z-index:1000;">
+    {% if user.is_authenticated %}
+    <div id="welcome-toast" class="welcome-greeting" style="text-align:center; margin: 32px auto 0 auto; font-size:1.7rem; font-weight:700; color:#fff; max-width:650px; background: linear-gradient(90deg,#38e8ad,#4f8cff 80%); border-radius: 18px; box-shadow: 0 8px 32px #38e8ad33, 0 2px 8px #0001; padding: 22px 0 18px 0; opacity:0; transition: opacity 1s; letter-spacing:2px;">
+        Welcome, {{ user.username }}!
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var toast = document.getElementById('welcome-toast');
+        if (toast) {
+            setTimeout(function() { toast.style.opacity = '1'; }, 100);
+            setTimeout(function() {
+                toast.style.opacity = '0';
+                setTimeout(function() { toast.style.display = 'none'; }, 700);
+            }, 5000);
+        }
+    });
+    </script>
+    {% endif %}
+</div>
+<!-- Only keep the hero, features, steps, and user-facing content -->
 <header class="hero">
     <div class="hero-content">
         <h1>Welcome to Road Complaint Portal</h1>
@@ -97,7 +115,8 @@ document.addEventListener("DOMContentLoaded", function() {
         <a href="{% url 'submit_complaint' %}" class="btn btn-primary report-complaint-btn">Report a Complaint</a>
     </div>
 </main>
-<!-- Reports Section: Side by Side -->
+
+<!-- Analytics Section: Bar and Pie Charts -->
 <section class="reports-section">
   <div class="reports-grid">
     <!-- Complaints Bar Graph Card (with filter) -->
@@ -143,36 +162,13 @@ document.addEventListener("DOMContentLoaded", function() {
   </div>
 </section>
 
-<!-- Contact Section -->
-<!-- Removed 'Need Help?' section as requested -->
-
 <!-- Linking CSS and JS -->
-<!-- Font Awesome for icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<!-- Chart.js for future charts (optional) -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
 <script src="{% static 'js/script.js' %}"></script>
 <script>
-// Animated Counters
-function animateCounter(id, end) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    let start = 0;
-    const duration = 1000;
-    const step = Math.ceil(end / (duration / 30));
-    function update() {
-        start += step;
-        if (start >= end) {
-            el.textContent = end;
-        } else {
-            el.textContent = start;
-            requestAnimationFrame(update);
-        }
-    }
-    update();
-}
-
+// --- 7 Days Complaints Bar Chart ---
 document.addEventListener('DOMContentLoaded', function() {
     // Animated Counters
     function animateCounter(id, end) {
@@ -192,10 +188,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         update();
     }
-
-    animateCounter('totalComplaints', parseInt('{{ total_complaints|default:0 }}', 10));
-    animateCounter('pendingComplaints', parseInt('{{ pending_complaints|default:0 }}', 10));
-    animateCounter('resolvedComplaints', parseInt('{{ resolved_complaints|default:0 }}', 10));
 
     // --- 7 Days Complaints Bar Chart ---
     const ctxBar = document.getElementById('complaints7DaysBarChart').getContext('2d');
@@ -361,5 +353,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-
 {% endblock %}

@@ -21,7 +21,7 @@
                 <label for="username">Username</label>
                 <input type="text" name="username" id="username" required class="form-control" value="{{ form.username.value|default_if_none:'' }}">
                 {% if form.username.errors %}
-                    <div class="alert alert-warning" style="background:linear-gradient(90deg,#ffd6e0 0%,#f9e79f 100%);color:#a94442;border:1.5px solid #f5c6cb;border-radius:6px;margin-top:8px;font-weight:600;box-shadow:0 2px 8px #f5c6cb55;padding:8px 12px;">{{ form.username.errors.0 }}</div>
+                    <div class="alert alert-warning">{{ form.username.errors.0 }}</div>
                 {% endif %}
             </div>
 
@@ -29,21 +29,30 @@
                 <label for="email">Email Address</label>
                 <input type="email" name="email" id="email" required class="form-control" value="{{ form.email.value|default_if_none:'' }}">
                 {% if form.email.errors %}
-                    <div class="alert alert-warning" style="background:linear-gradient(90deg,#ffd6e0 0%,#f9e79f 100%);color:#a94442;border:1.5px solid #f5c6cb;border-radius:6px;margin-top:8px;font-weight:600;box-shadow:0 2px 8px #f5c6cb55;padding:8px 12px;">{{ form.email.errors.0 }}</div>
+                    <div class="alert alert-warning">{{ form.email.errors.0 }}</div>
                 {% endif %}
             </div>
 
             <div class="form-group" style="margin-bottom:18px;">
                 <label for="password">Password</label>
                 <div class="input-group" style="display:flex;align-items:center;">
-    <input type="password" name="password" id="password" required class="form-control" style="flex:1;">
-    <div style="margin-left:10px;">
-        <input type="checkbox" id="togglePassword">
-        <label for="togglePassword" style="font-size:13px;">Show</label>
-    </div>
-</div>
+                    <input type="password" name="password" id="password" required class="form-control" style="flex:1;">
+                    <div style="margin-left:10px;">
+                        <input type="checkbox" id="togglePassword">
+                        <label for="togglePassword" style="font-size:13px;">Show</label>
+                    </div>
+                </div>
+                <div id="password-requirements" class="password-requirements" style="margin-top:8px;font-size:13px;color:#666;">
+                    <p style="margin-bottom:4px;">Password must:</p>
+                    <ul style="list-style:none;padding-left:0;margin:0;">
+                        <li id="length-check"><span class="requirement-icon">❌</span> Be 8-15 characters long</li>
+                        <li id="uppercase-check"><span class="requirement-icon">❌</span> Contain an uppercase letter</li>
+                        <li id="lowercase-check"><span class="requirement-icon">❌</span> Contain a lowercase letter</li>
+                        <li id="number-check"><span class="requirement-icon">❌</span> Contain a number</li>
+                    </ul>
+                </div>
                 {% if form.password.errors %}
-                    <div class="alert alert-warning" style="background: linear-gradient(90deg, #ffd6e0 0%, #f9e79f 100%); color: #a94442; border: 1.5px solid #f5c6cb; border-radius: 6px; margin-top: 8px; font-weight: 600; box-shadow: 0 2px 8px #f5c6cb55; padding: 8px 12px;">
+                    <div class="alert alert-warning">
                         {% if form.password.errors|length > 1 %}
                             <ul style="margin-bottom:0;">
                                 {% for err in form.password.errors %}
@@ -60,14 +69,17 @@
             <div class="form-group" style="margin-bottom:18px;">
                 <label for="confirm_password">Confirm Password</label>
                 <div class="input-group" style="display:flex;align-items:center;">
-    <input type="password" name="confirm_password" id="confirm_password" required class="form-control" style="flex:1;">
-    <div style="margin-left:10px;">
-        <input type="checkbox" id="toggleConfirmPassword">
-        <label for="toggleConfirmPassword" style="font-size:13px;">Show</label>
-    </div>
-</div>
+                    <input type="password" name="confirm_password" id="confirm_password" required class="form-control" style="flex:1;">
+                    <div style="margin-left:10px;">
+                        <input type="checkbox" id="toggleConfirmPassword">
+                        <label for="toggleConfirmPassword" style="font-size:13px;">Show</label>
+                    </div>
+                </div>
+                <div id="password-match" class="password-match" style="margin-top:8px;font-size:13px;color:#666;">
+                    <span class="requirement-icon">❌</span> Passwords must match
+                </div>
                 {% if form.confirm_password.errors %}
-                    <div class="alert alert-warning" style="background:linear-gradient(90deg,#ffd6e0 0%,#f9e79f 100%);color:#a94442;border:1.5px solid #f5c6cb;border-radius:6px;margin-top:8px;font-weight:600;box-shadow:0 2px 8px #f5c6cb55;padding:8px 12px;">{{ form.confirm_password.errors.0 }}</div>
+                    <div class="alert alert-warning">{{ form.confirm_password.errors.0 }}</div>
                 {% endif %}
             </div>
 
@@ -75,14 +87,14 @@
                 <label for="security_answer_1">What is your favourite food?</label>
                 <input type="text" name="security_answer_1" id="security_answer_1" required class="form-control" value="{{ form.security_answer_1.value|default_if_none:'' }}">
                 {% if form.security_answer_1.errors %}
-                    <div class="alert alert-warning" style="background:linear-gradient(90deg,#ffd6e0 0%,#f9e79f 100%);color:#a94442;border:1.5px solid #f5c6cb;border-radius:6px;margin-top:8px;font-weight:600;box-shadow:0 2px 8px #f5c6cb55;padding:8px 12px;">{{ form.security_answer_1.errors.0 }}</div>
+                    <div class="alert alert-warning">{{ form.security_answer_1.errors.0 }}</div>
                 {% endif %}
             </div>
             <div class="form-group">
                 <label for="security_answer_2">What is your childhood name?</label>
                 <input type="text" name="security_answer_2" id="security_answer_2" required class="form-control" value="{{ form.security_answer_2.value|default_if_none:'' }}">
                 {% if form.security_answer_2.errors %}
-                    <div class="alert alert-warning" style="background:linear-gradient(90deg,#ffd6e0 0%,#f9e79f 100%);color:#a94442;border:1.5px solid #f5c6cb;border-radius:6px;margin-top:8px;font-weight:600;box-shadow:0 2px 8px #f5c6cb55;padding:8px 12px;">{{ form.security_answer_2.errors.0 }}</div>
+                    <div class="alert alert-warning">{{ form.security_answer_2.errors.0 }}</div>
                 {% endif %}
             </div>
 
@@ -94,8 +106,72 @@
         <p class="mt-3 text-center">
             Already have an account? <a href="{% url 'login' %}">Login here</a>
         </p>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-        <script src="{% static 'js/toggle-password.js' %}"></script>
     </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+<script src="{% static 'js/toggle-password.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirm_password');
+    const lengthCheck = document.getElementById('length-check');
+    const uppercaseCheck = document.getElementById('uppercase-check');
+    const lowercaseCheck = document.getElementById('lowercase-check');
+    const numberCheck = document.getElementById('number-check');
+    const passwordMatch = document.getElementById('password-match');
+
+    function updateRequirement(element, isValid) {
+        const icon = element.querySelector('.requirement-icon');
+        if (isValid) {
+            icon.textContent = '✔';
+            icon.style.color = '#28a745';
+            element.style.color = '#28a745';
+        } else {
+            icon.textContent = '❌';
+            icon.style.color = '#dc3545';
+            element.style.color = '#dc3545';
+        }
+    }
+
+    passwordInput.addEventListener('input', function() {
+        const value = passwordInput.value;
+        updateRequirement(lengthCheck, value.length >= 8 && value.length <= 15);
+        updateRequirement(uppercaseCheck, /[A-Z]/.test(value));
+        updateRequirement(lowercaseCheck, /[a-z]/.test(value));
+        updateRequirement(numberCheck, /[0-9]/.test(value));
+        // Also check password match on password change
+        checkPasswordMatch();
+    });
+
+    confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+    passwordInput.addEventListener('input', checkPasswordMatch);
+
+    function checkPasswordMatch() {
+        const pw = passwordInput.value;
+        const cpw = confirmPasswordInput.value;
+        const icon = passwordMatch.querySelector('.requirement-icon');
+        if (pw && cpw && pw === cpw) {
+            icon.textContent = '✔';
+            icon.style.color = '#28a745';
+            passwordMatch.style.color = '#28a745';
+            passwordMatch.childNodes[1].textContent = ' Passwords match';
+        } else {
+            icon.textContent = '❌';
+            icon.style.color = '#dc3545';
+            passwordMatch.style.color = '#dc3545';
+            passwordMatch.childNodes[1].textContent = ' Passwords must match';
+        }
+    }
+});
+</script>
+
+<style>
+.password-requirements ul li {
+    margin-bottom: 4px;
+}
+.requirement-icon {
+    margin-right: 8px;
+}
+</style>
 {% endblock %}

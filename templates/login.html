@@ -8,13 +8,6 @@
     <div class="auth-form">
         <h2>Login</h2>
 
-        <!-- Show error or success messages -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-
         <form method="post">
             {% csrf_token %}
             <div class="form-group">
@@ -32,12 +25,6 @@
                     </div>
                 </div>
             </div>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-            <script>
-
-            </script>
-            <script src="{% static 'js/toggle-password.js' %}"></script>
-<script src="{% static 'js/toggle-password.js' %}"></script>
 
             <button type="submit" class="btn btn-primary w-100">Login</button>
         </form>
@@ -50,4 +37,7 @@
         </p>
     </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+<script src="{% static 'js/toggle-password.js' %}"></script>
 {% endblock %}

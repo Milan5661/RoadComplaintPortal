@@ -1,0 +1,43 @@
+@startuml Road Complaint Portal Activity Diagram
+
+start
+:Access Portal;
+if (User Logged In?) then (no)
+  :Choose Action;
+  if (Register?) then (yes)
+    :Show Registration Form;
+    :Fill Registration Form;
+    :Validate Form;
+    if (Valid?) then (yes)
+      :Create User Account;
+      :Redirect to Login;
+    else (no)
+      :Show Error Messages;
+      :Return to Registration;
+    endif
+  else (Login)
+    :Show Login Form;
+    :Enter Credentials;
+    :Validate Credentials;
+    if (Valid?) then (yes)
+      :Authenticate User;
+      :Redirect to Dashboard;
+    else (no)
+      :Show Error Message;
+      :Return to Login;
+    endif
+  endif
+else (yes)
+  :Access Dashboard;
+  :Choose Action;
+  if (Logout?) then (yes)
+    :Logout User;
+    :Redirect to Login;
+  else
+    :Perform Selected Action;
+  endif
+endif
+:Continue Using Portal;
+stop
+
+@enduml 

@@ -37,4 +37,17 @@ urlpatterns = [
 
     # Preview User Management Dashboard
     path('preview/', views.user_management_preview, name='user_management_preview'),
+
+    # User Management Views
+    path('admin/users/', views.user_management, name='user_management'),
+    path('admin/users/<int:user_id>/toggle-status/', views.toggle_user_status, name='toggle_user_status'),
+    path('admin/users/<int:user_id>/reset-password/', views.reset_user_password, name='reset_user_password'),
+
+    # New admin login view
+    path('admin-login/', views.admin_login, name='admin_login'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('users/', views.user_management, name='user_management'),
+    # path('complaints/', views.complaint_management, name='complaint_management'),
+    # path('reports/', views.reports, name='reports'),
+    # path('settings/', views.settings, name='settings'),
 ]

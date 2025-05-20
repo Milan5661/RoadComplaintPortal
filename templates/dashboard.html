@@ -8,51 +8,164 @@
     <h1 class="text-center mb-5" style="font-weight: bold; font-size: 2.5rem;">Road Complaint Dashboard</h1>
     
     <div class="row">
-    <div class="col-md-2">
-        <div class="list-group">
-            <a href="/admin/tweet/complaint/" class="list-group-item list-group-item-action">Complaints</a>
-            <a href="/report-generation/" class="list-group-item list-group-item-action">Report Generation</a>
+        <div class="col-md-2">
+            <div class="list-group">
+                <a href="/admin/tweet/complaint/" class="list-group-item list-group-item-action">Complaints</a>
+                <a href="/report-generation/" class="list-group-item list-group-item-action">Report Generation</a>
+                <a href="/admin/users/" class="list-group-item list-group-item-action">User Management</a>
+            </div>
+        </div>
+        <div class="col-md-10">
+            <!-- Stats Cards Row -->
+            <div class="row mb-4">
+                <!-- Total Complaints -->
+                <div class="col-md-3">
+                    <div class="card text-center shadow p-4 rounded-4 border-0 bg-light h-100 dashboard-card">
+                        <div class="card-body">
+                            <i class="fas fa-list fa-3x mb-3 text-primary"></i>
+                            <h2 id="totalComplaints" class="counter mb-2" style="font-size: 2.5rem;">{{ total_complaints }}</h2>
+                            <p class="mb-0" style="font-weight: bold;">Total Complaints</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Complaints -->
+                <div class="col-md-3">
+                    <div class="card text-center shadow p-4 rounded-4 border-0 bg-light h-100 dashboard-card">
+                        <div class="card-body">
+                            <i class="fas fa-hourglass-half fa-3x mb-3 text-warning"></i>
+                            <h2 id="pendingComplaints" class="counter mb-2" style="font-size: 2.5rem;">{{ pending_complaints }}</h2>
+                            <p class="mb-0" style="font-weight: bold;">Pending Complaints</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- In Progress Complaints -->
+                <div class="col-md-3">
+                    <div class="card text-center shadow p-4 rounded-4 border-0 bg-light h-100 dashboard-card">
+                        <div class="card-body">
+                            <i class="fas fa-tasks fa-3x mb-3 text-info"></i>
+                            <h2 id="inProgressComplaints" class="counter mb-2" style="font-size: 2.5rem;">{{ in_progress_complaints }}</h2>
+                            <p class="mb-0" style="font-weight: bold;">In Progress</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resolved Complaints -->
+                <div class="col-md-3">
+                    <div class="card text-center shadow p-4 rounded-4 border-0 bg-light h-100 dashboard-card">
+                        <div class="card-body">
+                            <i class="fas fa-check-circle fa-3x mb-3 text-success"></i>
+                            <h2 id="resolvedComplaints" class="counter mb-2" style="font-size: 2.5rem;">{{ resolved_complaints }}</h2>
+                            <p class="mb-0" style="font-weight: bold;">Resolved Complaints</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="row mb-4">
+                <!-- Monthly Trend Chart -->
+                <div class="col-md-8">
+                    <div class="card shadow p-4 rounded-4 border-0">
+                        <h4 class="mb-4">Monthly Complaint Trend</h4>
+                        <canvas id="monthlyTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Location Stats -->
+                <div class="col-md-4">
+                    <div class="card shadow p-4 rounded-4 border-0">
+                        <h4 class="mb-4">Top Complaint Areas</h4>
+                        <div class="list-group">
+                            {% for location in location_stats %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ location.address }}
+                                <span class="badge bg-primary rounded-pill">{{ location.count }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Complaints -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow p-4 rounded-4 border-0">
+                        <h4 class="mb-4">Recent Complaints</h4>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Address</th>
+                                        <th>Status</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for complaint in recent_complaints %}
+                                    <tr>
+                                        <td>{{ complaint.created_at|date:"M d, Y" }}</td>
+                                        <td>{{ complaint.address }}</td>
+                                        <td>
+                                            <span class="badge {% if complaint.status == 'Resolved' %}bg-success{% elif complaint.status == 'Pending' %}bg-warning{% else %}bg-info{% endif %}">
+                                                {{ complaint.status }}
+                                            </span>
+                                        </td>
+                                        <td>{{ complaint.description|truncatechars:50 }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-md-10">
-
-        <!-- Left Card: Total Complaints -->
-        <div class="col-md-3">
-            <div class="card text-center shadow p-4 rounded-4 border-0 bg-light h-100 dashboard-card">
-                <div class="card-body">
-                    <i class="fas fa-list fa-3x mb-3 text-primary"></i>
-                    <h2 id="totalComplaints" class="counter mb-2" style="font-size: 2.5rem;">0</h2>
-                    <p class="mb-0" style="font-weight: bold;">Total Complaints</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Center Card: Pending Complaints -->
-        <div class="col-md-3">
-            <div class="card text-center shadow p-4 rounded-4 border-0 bg-light h-100 dashboard-card">
-                <div class="card-body">
-                    <i class="fas fa-hourglass-half fa-3x mb-3 text-warning"></i>
-                    <h2 id="pendingComplaints" class="counter mb-2" style="font-size: 2.5rem;">0</h2>
-                    <p class="mb-0" style="font-weight: bold;">Pending Complaints</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Card: Resolved Complaints -->
-        <div class="col-md-3">
-            <div class="card text-center shadow p-4 rounded-4 border-0 bg-light h-100 dashboard-card">
-                <div class="card-body">
-                    <i class="fas fa-check-circle fa-3x mb-3 text-success"></i>
-                    <h2 id="resolvedComplaints" class="counter mb-2" style="font-size: 2.5rem;">0</h2>
-                    <p class="mb-0" style="font-weight: bold;">Resolved Complaints</p>
-                </div>
-            </div>
-        </div>
-        </div>
 </div>
 
-<!-- Counter Animation -->
+<!-- Chart.js for visualizations -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
+// Monthly Trend Chart
+const monthlyData = {{ monthly_trend|safe }};
+const ctx = document.getElementById('monthlyTrendChart').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: monthlyData.map(item => new Date(item.month).toLocaleDateString('default', { month: 'short', year: 'numeric' })),
+        datasets: [{
+            label: 'Complaints',
+            data: monthlyData.map(item => item.count),
+            borderColor: '#2a5298',
+            backgroundColor: 'rgba(42, 82, 152, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                }
+            }
+        }
+    }
+});
+
+// Counter Animation
 document.addEventListener('DOMContentLoaded', function() {
     function animateCounter(id, end) {
         let start = 0;
@@ -70,9 +183,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 40);
     }
 
-    animateCounter('totalComplaints', Number("{{ total_complaints|default:0 }}"));
-    animateCounter('resolvedComplaints', Number("{{ resolved_complaints|default:0 }}"));
-    animateCounter('pendingComplaints', Number("{{ pending_complaints|default:0 }}"));
+    animateCounter('totalComplaints', {{ total_complaints }});
+    animateCounter('resolvedComplaints', {{ resolved_complaints }});
+    animateCounter('pendingComplaints', {{ pending_complaints }});
+    animateCounter('inProgressComplaints', {{ in_progress_complaints }});
 });
 </script>
 
