@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </style>
 {% block content %}
 <div class="container" style="position:relative;z-index:1000;">
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated and show_welcome %}
     <div id="welcome-toast" class="welcome-greeting" style="text-align:center; margin: 32px auto 0 auto; font-size:1.7rem; font-weight:700; color:#fff; max-width:650px; background: linear-gradient(90deg,#38e8ad,#4f8cff 80%); border-radius: 18px; box-shadow: 0 8px 32px #38e8ad33, 0 2px 8px #0001; padding: 22px 0 18px 0; opacity:0; transition: opacity 1s; letter-spacing:2px;">
         Welcome, {{ user.username }}!
     </div>
@@ -351,6 +351,24 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }]
     });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Restore scroll position if available
+    const savedScroll = sessionStorage.getItem('scrollY');
+    if (savedScroll !== null) {
+        window.scrollTo(0, parseInt(savedScroll, 10));
+        sessionStorage.removeItem('scrollY');
+    }
+
+    // Attach to the filter form
+    const filterForm = document.getElementById('reportFilterForm');
+    if (filterForm) {
+        filterForm.addEventListener('submit', function() {
+            sessionStorage.setItem('scrollY', window.scrollY);
+        });
+    }
 });
 </script>
 {% endblock %}

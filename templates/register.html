@@ -75,7 +75,7 @@
                         <label for="toggleConfirmPassword" style="font-size:13px;">Show</label>
                     </div>
                 </div>
-                <div id="password-match" class="password-match" style="margin-top:8px;font-size:13px;color:#666;">
+                <div id="password-match" class="password-match" style="margin-top:8px;font-size:13px;color:#dc3545;">
                     <span class="requirement-icon">❌</span> Passwords must match
                 </div>
                 {% if form.confirm_password.errors %}
@@ -140,7 +140,6 @@ document.addEventListener('DOMContentLoaded', function() {
         updateRequirement(uppercaseCheck, /[A-Z]/.test(value));
         updateRequirement(lowercaseCheck, /[a-z]/.test(value));
         updateRequirement(numberCheck, /[0-9]/.test(value));
-        // Also check password match on password change
         checkPasswordMatch();
     });
 
@@ -155,12 +154,12 @@ document.addEventListener('DOMContentLoaded', function() {
             icon.textContent = '✔';
             icon.style.color = '#28a745';
             passwordMatch.style.color = '#28a745';
-            passwordMatch.childNodes[1].textContent = ' Passwords match';
+            passwordMatch.innerHTML = '<span class="requirement-icon">✔</span> Passwords match';
         } else {
             icon.textContent = '❌';
             icon.style.color = '#dc3545';
             passwordMatch.style.color = '#dc3545';
-            passwordMatch.childNodes[1].textContent = ' Passwords must match';
+            passwordMatch.innerHTML = '<span class="requirement-icon">❌</span> Passwords must match';
         }
     }
 });
