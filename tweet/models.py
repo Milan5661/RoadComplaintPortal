@@ -19,6 +19,9 @@ class Complaint(models.Model):
     created_at= models.DateTimeField(auto_now_add=True)
     is_approved = models.BooleanField(default=False) 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    rejection_reason = models.TextField(blank=True, null=True)
+    estimated_completion = models.DateTimeField(blank=True, null=True)
+    budget_estimate = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
@@ -33,6 +36,30 @@ class ComplaintImage(models.Model):
 
     def __str__(self):
         return f"Image for Complaint {self.complaint.id}"
+
+
+class Notification(models.Model):
+    NOTIFICATION_TYPES = [
+        ('status_change', 'Status Change'),
+        ('rejection', 'Rejection'),
+        ('budget_update', 'Budget Update'),
+        ('completion_update', 'Completion Update'),
+        ('deletion', 'Deletion'),
+    ]
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    complaint = models.ForeignKey(Complaint, on_delete=models.SET_NULL, null=True, related_name='notifications')
+    complaint_reference = models.CharField(max_length=255, null=True, blank=True)  # Store complaint reference
+    notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.notification_type} - {self.created_at}"
 
 class AdminProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='admin_profile')

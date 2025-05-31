@@ -11,7 +11,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from rest_framework import generics
 from accounts.forms import UserRegistrationForm, ComplaintForm, AdminSecurityQuestionForm, AdminPasswordResetForm
-from .models import Complaint, AdminProfile
+from .models import Complaint, AdminProfile, Notification
 from .serializers import ComplaintSerializer
 import random
 import re
@@ -22,6 +22,7 @@ from django.db.models.functions import TruncMonth
 from django.db.models import Q
 import hashlib
 from django.conf import settings
+from django.views.decorators.http import require_POST
 # ----------------- Static Pages -------------
 
 from django.contrib.admin.views.decorators import staff_member_required
@@ -435,9 +436,8 @@ def complaint_form(request):
             for image in images:
                 ComplaintImage.objects.create(complaint=complaint, image=image)
 
-            # Set success message and redirect
-            messages.success(request, "Report completed successfully! Your complaint has been submitted.")
-            return redirect('tweet:my_complaints')
+            # Render the complaint_success.html template with complaint_id
+            return render(request, "complaint_success.html", {"complaint_id": complaint.id})
         else:
             messages.error(request, "Error submitting complaint. Please try again.")
     return render(request, "complaint_form.html", {"form": form})
@@ -694,4 +694,134 @@ def reports(request):
         'recent_complaints': recent_complaints,
     }
     return render(request, 'reports.html', context)
+
+def get_notifications(request):
+    """Context processor to get notifications for the current user"""
+    if request.user.is_authenticated:
+        notifications = Notification.objects.filter(user=request.user)[:10]  # Get last 10 notifications
+        unread_count = notifications.filter(is_read=False).count()
+        return {
+            'notifications': notifications,
+            'unread_notifications_count': unread_count
+        }
+    return {
+        'notifications': [],
+        'unread_notifications_count': 0
+    }
+
+@require_POST
+@login_required
+def mark_notification_read(request, notification_id):
+    """Mark a notification as read"""
+    try:
+        notification = Notification.objects.get(id=notification_id, user=request.user)
+        notification.is_read = True
+        notification.save()
+        return JsonResponse({'success': True})
+    except Notification.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Notification not found'}, status=404)
+
+@require_POST
+@login_required
+def mark_all_notifications_read(request):
+    """Mark all notifications as read for the current user"""
+    qs = Notification.objects.filter(user=request.user, is_read=False)
+    print("DEBUG: Marking as read:", qs.count())
+    qs.update(is_read=True)
+    return JsonResponse({'success': True})
+
+def create_notification(user, complaint, notification_type, message):
+    """Helper function to create a notification"""
+    Notification.objects.create(
+        user=user,
+        complaint=complaint,
+        notification_type=notification_type,
+        message=message
+    )
+
+# Update the complaint status change view to create notifications
+@login_required
+def update_complaint_status(request, complaint_id):
+    if request.method == 'POST':
+        try:
+            complaint = Complaint.objects.get(id=complaint_id)
+            new_status = request.POST.get('status')
+            rejection_reason = request.POST.get('rejection_reason')
+            estimated_completion = request.POST.get('estimated_completion')
+            budget_estimate = request.POST.get('budget_estimate')
+
+            # Define valid status transitions
+            valid_transitions = {
+                'Pending': ['In Progress', 'Resolved'],
+                'In Progress': ['Resolved'],
+                'Resolved': []  # No further transitions allowed
+            }
+
+            # Check if the transition is valid
+            if new_status in dict(Complaint.STATUS_CHOICES):
+                if new_status in valid_transitions.get(complaint.status, []):
+                    old_status = complaint.status
+                    complaint.status = new_status
+                    
+                    if rejection_reason:
+                        complaint.rejection_reason = rejection_reason
+                    
+                    if estimated_completion:
+                        complaint.estimated_completion = datetime.strptime(estimated_completion, '%Y-%m-%d')
+                    
+                    if budget_estimate:
+                        complaint.budget_estimate = budget_estimate
+                    
+                    complaint.save()
+
+                    # Create notification for status change
+                    message = f"Your complaint status has been updated from {old_status} to {new_status}"
+                    create_notification(complaint.user, complaint, 'status_change', message)
+
+                    # Create notification for rejection if applicable
+                    if new_status == 'Rejected' and rejection_reason:
+                        message = f"Your complaint has been rejected. Reason: {rejection_reason}"
+                        create_notification(complaint.user, complaint, 'rejection', message)
+
+                    # Create notification for budget update if applicable
+                    if budget_estimate:
+                        message = f"Budget estimate for your complaint: Rs {budget_estimate}"
+                        create_notification(complaint.user, complaint, 'budget_update', message)
+
+                    # Create notification for completion update if applicable
+                    if estimated_completion:
+                        message = f"Estimated completion date for your complaint: {estimated_completion}"
+                        create_notification(complaint.user, complaint, 'completion_update', message)
+
+                    messages.success(request, "Complaint status updated successfully!")
+                else:
+                    messages.error(request, f"Cannot change status from {complaint.status} to {new_status}. Valid transitions are: {', '.join(valid_transitions[complaint.status])}")
+            else:
+                messages.error(request, "Invalid status!")
+        except Complaint.DoesNotExist:
+            messages.error(request, "Complaint not found!")
+    return redirect('tweet:complaint_management')
+
+@login_required
+def notifications_api(request):
+    # Get all notifications for unread count
+    all_notifications = Notification.objects.filter(user=request.user)
+    unread_count = all_notifications.filter(is_read=False).count()
+    # Always get the latest 10 notifications for display
+    notifications = all_notifications.order_by('-created_at')[:10]
+    data = {
+        'unread_count': unread_count,
+        'notifications': [
+            {
+                'id': n.id,
+                'complaint_id': n.complaint.id if n.complaint else None,
+                'type': n.get_notification_type_display(),
+                'message': n.message,
+                'created_at': n.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'is_read': n.is_read,
+                'image_url': n.complaint.images.first().image.url if n.complaint and n.complaint.images.exists() else None,
+            } for n in notifications
+        ]
+    }
+    return JsonResponse(data)
 

@@ -105,8 +105,19 @@
                             <td>{{ complaint.address }}</td>
                             <td>{{ complaint.created_at|date:"M d, Y H:i" }}</td>
                             <td>
-                                <a href="#" class="btn btn-sm btn-primary">View</a>
-                                <a href="#" class="btn btn-sm btn-info">Edit</a>
+                                <form method="POST" action="{% url 'tweet:update_complaint_status' complaint.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <select name="status" class="form-select form-select-sm d-inline-block" style="width: auto;">
+                                        {% if complaint.status == 'Pending' %}
+                                            <option value="In Progress">In Progress</option>
+                                            <option value="Resolved">Resolved</option>
+                                        {% elif complaint.status == 'In Progress' %}
+                                            <option value="Resolved">Resolved</option>
+                                        {% endif %}
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                                </form>
+                                <a href="#" class="btn btn-sm btn-info">View</a>
                             </td>
                         </tr>
                         {% empty %}

@@ -50,4 +50,10 @@ urlpatterns = [
     # path('complaints/', views.complaint_management, name='complaint_management'),
     # path('reports/', views.reports, name='reports'),
     # path('settings/', views.settings, name='settings'),
+
+    # Notification URLs
+    path('notifications/mark-read/<int:notification_id>/', views.mark_notification_read, name='mark_notification_read'),
+    path('notifications/mark-all-read/', views.mark_all_notifications_read, name='mark_all_notifications_read'),
+    path('complaints/<int:complaint_id>/update-status/', views.update_complaint_status, name='update_complaint_status'),
+    path('notifications/api/', views.notifications_api, name='notifications_api'),
 ]

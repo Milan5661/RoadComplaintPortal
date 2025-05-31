@@ -1,0 +1,22 @@
+{% extends "admin/delete_confirmation.html" %}
+{% load i18n %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h1>{% blocktrans %}Are you sure?{% endblocktrans %}</h1>
+    <form method="post" action="">
+      {% csrf_token %}
+      <p>{% blocktrans %}Are you sure you want to delete the selected complaint? This action cannot be undone.{% endblocktrans %}</p>
+      <div class="form-group">
+        <label for="id_deletion_reason"><strong>Reason for deletion (will be sent to user):</strong></label>
+        <textarea name="deletion_reason" id="id_deletion_reason" class="form-control" rows="3"></textarea>
+      </div>
+      {{ deleted_objects|safe }}
+      <input type="hidden" name="post" value="yes">
+      <div class="submit-row">
+        <input type="submit" value="{% trans "Yes, I'm sure" %}" class="btn btn-danger">
+        <a href="{{ admin_url }}" class="btn btn-secondary">{% trans "Cancel" %}</a>
+      </div>
+    </form>
+  </div>
+{% endblock %} 

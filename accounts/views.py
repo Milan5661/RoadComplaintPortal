@@ -14,6 +14,8 @@ from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth.tokens import default_token_generator
 from django.http import HttpResponse
+from django.core.cache import cache
+import hashlib
 
 User = get_user_model()
 
@@ -75,25 +77,30 @@ def login_view(request):
             else:
                 return redirect(reverse('security_questions') + f'?username={username}')
 
-        user_auth = authenticate(request, username=username, password=password)
+        # Use the custom authentication backend
+        user_auth = authenticate(request, username=username, password=password, user_type=user_type)
         if user_auth is not None:
-            # Check if user type matches
-            if user_type == "admin" and not user_auth.is_superuser:
-                messages.error(request, "❌ This account is not an admin account.")
-                return render(request, "login.html")
-            elif user_type == "user" and user_auth.is_superuser:
-                messages.error(request, "❌ Please use admin login for admin accounts.")
-                return render(request, "login.html")
-
+            # Cycle session key instead of flush to keep CSRF token valid
+            request.session.cycle_key()
+            
+            # Create session first
             login(request, user_auth)
+            
+            # Now generate tab ID using the session key
+            tab_id = hashlib.md5(str(request.session.session_key).encode()).hexdigest()
+            
+            # Store user type and session key in cache with tab ID
+            cache.set(f'user_type_{user_auth.id}_{tab_id}', user_type, 3600)
+            cache.set(f'session_key_{user_auth.id}_{tab_id}', request.session.session_key, 3600)
+            
             user.failed_login_attempts = 0  # Reset failed attempts after successful login
             user.save()
-            messages.success(request, "Login successful!")
-            # REDIRECT BASED ON USER TYPE
-            if user_type == "admin":
-                return redirect("/admin/")  # Redirect to Django admin panel
-            else:
-                return redirect("home")  # homepage for regular users
+            
+            # Create response object to set cookie
+            response = redirect("/admin/" if user_type == "admin" else "home")
+            response.set_cookie('tab_id', tab_id, max_age=3600, httponly=True, samesite='Lax')
+            
+            return response
         else:
             user.failed_login_attempts += 1
             user.save()

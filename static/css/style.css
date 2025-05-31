@@ -34,6 +34,8 @@
   background: linear-gradient(90deg, #e0ffe6 0%, #b8ffce 100%);
   color: #20713a;
   border-color: #32d17c;
+  box-shadow: none !important;
+  border-width: 1.5px;
 }
 .alert-success:before {
   content: '\2714'; /* Checkmark */
