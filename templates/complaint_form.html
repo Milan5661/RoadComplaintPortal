@@ -66,51 +66,18 @@
                     <p class="text-muted">(Required) Add at least one and at most four photos of the issue</p>
                 </label>
                 <input type="file" id="images" name="images" accept="image/*" multiple onchange="validateImageCount(event); previewImages(event)">
-<div id="image-error" class="image-error-message" style="display:none;"></div>
+                <div id="image-error" class="image-error-message" style="display:none;"></div>
             </div>
             
+            <!-- Image Preview Container -->
+            <div id="image-preview" class="image-preview-container"></div>
+            
             <button type="submit" class="submit-btn">Submit Complaint</button>
-
-<!-- Image Preview Thumbnails -->
-<div id="image-preview" style="display:flex;gap:10px;margin-top:10px;"></div>
-
-<!-- Lightbox Modal -->
-<div id="lightboxModal" style="display:none;position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);justify-content:center;align-items:center;">
-    <img id="lightboxImg" src="" alt="Full Image" style="max-width:90vw;max-height:90vh;box-shadow:0 4px 32px #000;border-radius:8px;">
-</div>
         </form>
     </div>
 </div>
 
 <script>
-    const btn = document.getElementById('getLocationBtn');
-    btn.addEventListener('click', function() {
-        if (navigator.geolocation) {
-            btn.disabled = true;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting Location...';
-            navigator.geolocation.getCurrentPosition(function(position) {
-                document.getElementById('latitude').value = position.coords.latitude.toFixed(8);
-                document.getElementById('longitude').value = position.coords.longitude.toFixed(8);
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }, function(error) {
-                let msg = 'Error getting location: ' + error.message;
-                if (error.code === 1) {
-                    msg += '\nPlease allow location access in your browser settings and try again.';
-                }
-                alert(msg);
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }, {
-                enableHighAccuracy: true,
-                timeout: 20000,
-                maximumAge: 0
-            });
-        } else {
-            alert('Geolocation is not supported by this browser.');
-        }
-    });
 // Limit image uploads to 4
 function validateImageCount(event) {
     const input = event.target;
@@ -120,13 +87,64 @@ function validateImageCount(event) {
         errorDiv.textContent = 'No more than 4 photos can be uploaded.';
         input.value = '';
         event.preventDefault();
+        // Clear preview when validation fails
+        document.getElementById('image-preview').innerHTML = '';
     } else {
         errorDiv.style.display = 'none';
         errorDiv.textContent = '';
     }
 }
 
-// Prevent form submission if more than 4 files selected (extra safety)
+// Preview selected images
+function previewImages(event) {
+    const preview = document.getElementById('image-preview');
+    preview.innerHTML = ''; // Clear existing previews
+    
+    const files = event.target.files;
+    
+    if (files) {
+        Array.from(files).forEach((file, index) => {
+            if (index >= 4) return; // Only show first 4 images
+            
+            const reader = new FileReader();
+            const imgContainer = document.createElement('div');
+            imgContainer.className = 'preview-image-container';
+            
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'preview-image';
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.innerHTML = '×';
+                removeBtn.className = 'remove-image-btn';
+                removeBtn.onclick = function() {
+                    imgContainer.remove();
+                    // Create a new FileList without this image
+                    const dt = new DataTransfer();
+                    const input = document.getElementById('images');
+                    const { files } = input;
+                    
+                    for (let i = 0; i < files.length; i++) {
+                        if (i !== index) {
+                            dt.items.add(files[i]);
+                        }
+                    }
+                    
+                    input.files = dt.files;
+                };
+                
+                imgContainer.appendChild(img);
+                imgContainer.appendChild(removeBtn);
+            };
+            
+            reader.readAsDataURL(file);
+            preview.appendChild(imgContainer);
+        });
+    }
+}
+
+// Prevent form submission if more than 4 files selected
 document.getElementById('complaintForm').addEventListener('submit', function(e) {
     const imagesInput = document.getElementById('images');
     if (imagesInput.files.length > 4) {
@@ -134,37 +152,284 @@ document.getElementById('complaintForm').addEventListener('submit', function(e) 
         errorDiv.style.display = 'block';
         errorDiv.textContent = 'No more than 4 photos can be uploaded.';
         e.preventDefault();
+    } else if (imagesInput.files.length === 0) {
+        const errorDiv = document.getElementById('image-error');
+        errorDiv.style.display = 'block';
+        errorDiv.textContent = 'Please upload at least one photo.';
+        e.preventDefault();
     }
 });
 </script>
+
 <style>
+.complaint-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+}
+
+.complaint-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.1);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.complaint-title {
+    text-align: center;
+    color: #2a5298;
+    margin-bottom: 2rem;
+    font-weight: 600;
+}
+
+.form-section {
+    margin-bottom: 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-section label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #444;
+    font-weight: 500;
+}
+
+.form-section input[type="text"],
+.form-section textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    max-width: 100%;
+}
+
+.form-section textarea {
+    min-height: 120px;
+    resize: vertical;
+    max-height: 300px;
+    font-family: inherit;
+}
+
+.form-section input[type="text"]:focus,
+.form-section textarea:focus {
+    border-color: #3a37a6;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(58,55,166,0.1);
+}
+
+.location-section {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.location-btn {
+    background: #3a37a6;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.location-btn:hover {
+    background: #2a2982;
+    transform: translateY(-2px);
+}
+
+.file-upload {
+    margin-bottom: 1.5rem;
+}
+
+.file-upload label {
+    display: block;
+    padding: 1rem;
+    background: #f8f9fa;
+    border: 2px dashed #ddd;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.file-upload label:hover {
+    border-color: #3a37a6;
+    background: #f0f0ff;
+}
+
+.file-upload input[type="file"] {
+    display: none;
+}
+
+.file-upload .text-muted {
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.submit-btn {
+    background: #3a37a6;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    width: 100%;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.submit-btn:hover {
+    background: #2a2982;
+    transform: translateY(-2px);
+}
+
+.alert-error {
+    background: #fff4e5;
+    color: #b94a00;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border: 1px solid #ffb347;
+}
+
+/* Image preview styles */
+.image-preview-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.preview-image-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; /* Square aspect ratio */
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.preview-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.remove-image-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: rgba(255,255,255,0.9);
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #666;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: all 0.2s;
+}
+
+.remove-image-btn:hover {
+    background: white;
+    color: #ff3333;
+    transform: scale(1.1);
+}
+
 .image-error-message {
-  display: none;
-  background: #fff4e5;
-  color: #b94a00;
-  border: 1px solid #ffb347;
-  border-radius: 10px;
-  padding: 0.75em 1em;
-  margin-top: 8px;
-  font-weight: 600;
-  font-size: 1.05em;
-  box-shadow: 0 2px 8px #ffb34733;
-  position: relative;
-  animation: shake 0.25s linear;
+    display: none;
+    background: #fff4e5;
+    color: #b94a00;
+    border: 1px solid #ffb347;
+    border-radius: 10px;
+    padding: 0.75em 1em;
+    margin-top: 8px;
+    font-weight: 600;
+    font-size: 1.05em;
+    box-shadow: 0 2px 8px rgba(255,179,71,0.2);
+    position: relative;
+    animation: shake 0.25s linear;
 }
+
 .image-error-message::before {
-  content: '\26A0'; /* Warning icon */
-  font-size: 1.2em;
-  margin-right: 0.6em;
-  vertical-align: middle;
+    content: '⚠'; /* Warning icon */
+    font-size: 1.2em;
+    margin-right: 0.6em;
+    vertical-align: middle;
 }
+
 @keyframes shake {
-  0% { transform: translateX(0); }
-  20% { transform: translateX(-6px); }
-  40% { transform: translateX(6px); }
-  60% { transform: translateX(-4px); }
-  80% { transform: translateX(4px); }
-  100% { transform: translateX(0); }
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+    100% { transform: translateX(0); }
+}
+
+@media (max-width: 768px) {
+    .complaint-card {
+        padding: 1.5rem;
+    }
+    
+    .location-section {
+        padding: 1rem;
+    }
+    
+    .submit-btn {
+        padding: 0.8rem 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .complaint-container {
+        margin: 1rem auto;
+    }
+    
+    .complaint-card {
+        padding: 1rem;
+        border-radius: 12px;
+    }
+    
+    .complaint-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-section input[type="text"],
+    .form-section textarea {
+        padding: 0.6rem;
+    }
+    
+    .location-btn,
+    .submit-btn {
+        padding: 0.7rem 1.2rem;
+    }
+    
+    .image-preview-container {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 0.5rem;
+    }
 }
 </style>
 {% endblock %}

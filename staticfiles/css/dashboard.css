@@ -1,0 +1,84 @@
+
+.dashboard-container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.dashboard-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    width: 30%;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card h3 {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.stat-card p {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.complaints-list table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.complaints-list th, .complaints-list td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.complaints-list th {
+    background: #007bff;
+    color: white;
+}
+
+.status {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.status.resolved {
+    background: #28a745;
+    color: white;
+}
+
+.status.pending {
+    background: #dc3545;
+    color: white;
+}
+
+.new-complaint {
+    margin-top: 20px;
+}
+
+.new-complaint .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #007bff;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+}

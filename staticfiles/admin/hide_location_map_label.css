@@ -1,0 +1,8 @@
+/* Hide the Location Map sidebar module in Django admin */
+#content-related .module:has(h2:contains("Location Map")) {
+    display: none !important;
+}
+/* Also hide empty modules (if short_description is empty) */
+#content-related .module:empty {
+    display: none !important;
+}

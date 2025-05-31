@@ -1,49 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    // Remove dynamic background changes for better performance
-    const hero = document.querySelector('.hero');
-    if (hero) {
-        hero.style.background = "url('{% static 'images/road1.jpg' %}') center center/cover no-repeat";
-    }
-});
-</script>
-<style>
-.page-wrapper {
-    background: #f5f5f5;
-}
-
-.hero {
-    background: url("{% static 'images/road1.jpg' %}") center center/cover no-repeat;
-    position: relative;
-}
-
-.hero::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.4);
-    z-index: 1;
-}
-
-.hero-content {
-    position: relative;
-    z-index: 2;
-}
-
-.page-wrapper, main, header, section {
-    position: relative;
-    z-index: 2;
-}
-
-</style>
 {% block content %}
-<div class="container" style="position:relative;z-index:1000;">
-</div>
-<!-- Only keep the hero, features, steps, and user-facing content -->
+<!-- Hero Section -->
 <header class="hero">
+    <img src="{% static 'images/road5.jpg' %}" alt="Road background" class="hero-image">
     <div class="hero-content">
         <h1>Welcome to Road Complaint Portal</h1>
         <p>Report road issues easily and help improve your community.</p>
@@ -101,48 +62,49 @@ document.addEventListener("DOMContentLoaded", function() {
 
 <!-- Analytics Section: Bar and Pie Charts -->
 <section class="reports-section">
-  <div class="reports-grid">
-    <!-- Complaints Bar Graph Card (with filter) -->
-    <div class="report-card">
-      <form id="reportFilterForm" method="get" class="filter-form">
-        <label for="filterPeriod" class="filter-label">Show Data For:</label>
-        <select name="filter" id="filterPeriod" class="form-select filter-select">
-          <option value="7d" {% if filter == '7d' or not filter %}selected{% endif %}>Last 7 Days</option>
-          <option value="month" {% if filter == 'month' %}selected{% endif %}>This Month</option>
-          <option value="year" {% if filter == 'year' %}selected{% endif %}>This Year</option>
-          <option value="custom_month" {% if filter == 'custom_month' %}selected{% endif %}>Custom Month</option>
-          <option value="custom_year" {% if filter == 'custom_year' %}selected{% endif %}>Custom Year</option>
-        </select>
-        <input type="month" name="month" id="monthPicker" class="form-control filter-input" value="{{ month|default:'' }}">
-        <input type="number" name="year" id="yearPicker" class="form-control filter-input" min="2000" max="2100" placeholder="Year" value="{{ year|default:'' }}">
-        <button type="submit" class="btn btn-primary filter-button">Apply</button>
-      </form>
-      <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const filterPeriod = document.getElementById('filterPeriod');
-        const monthPicker = document.getElementById('monthPicker');
-        const yearPicker = document.getElementById('yearPicker');
-        function updatePickers() {
-          monthPicker.style.display = (filterPeriod.value === 'custom_month') ? 'block' : 'none';
-          yearPicker.style.display = (filterPeriod.value === 'custom_year') ? 'block' : 'none';
-        }
-        filterPeriod.addEventListener('change', updatePickers);
-        updatePickers();
-      });
-      </script>
-      <h2 class="text-center mb-3">Complaints Report</h2>
-      <div class="chart-container">
-        <canvas id="complaints7DaysBarChart"></canvas>
-      </div>
+    <div class="reports-grid">
+        <!-- Complaints Bar Graph Card (with filter) -->
+        <div class="report-card">
+            <form id="reportFilterForm" method="get" class="filter-form">
+                <label for="filterPeriod" class="filter-label">Show Data For:</label>
+                <select name="filter" id="filterPeriod" class="form-select filter-select">
+                    <option value="7d" {% if filter == '7d' or not filter %}selected{% endif %}>Last 7 Days</option>
+                    <option value="month" {% if filter == 'month' %}selected{% endif %}>This Month</option>
+                    <option value="year" {% if filter == 'year' %}selected{% endif %}>This Year</option>
+                    <option value="custom_month" {% if filter == 'custom_month' %}selected{% endif %}>Custom Month</option>
+                    <option value="custom_year" {% if filter == 'custom_year' %}selected{% endif %}>Custom Year</option>
+                </select>
+                <input type="month" name="month" id="monthPicker" class="form-control filter-input" value="{{ month|default:'' }}">
+                <input type="number" name="year" id="yearPicker" class="form-control filter-input" min="2000" max="2100" placeholder="Year" value="{{ year|default:'' }}">
+                <button type="submit" class="btn btn-primary filter-button">Apply</button>
+            </form>
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const filterPeriod = document.getElementById('filterPeriod');
+                const monthPicker = document.getElementById('monthPicker');
+                const yearPicker = document.getElementById('yearPicker');
+                function updatePickers() {
+                    monthPicker.style.display = (filterPeriod.value === 'custom_month') ? 'block' : 'none';
+                    yearPicker.style.display = (filterPeriod.value === 'custom_year') ? 'block' : 'none';
+                }
+                filterPeriod.addEventListener('change', updatePickers);
+                updatePickers();
+            });
+            </script>
+            <h2 class="text-center mb-3">Complaints Report</h2>
+            <div class="chart-container">
+                <canvas id="complaints7DaysBarChart"></canvas>
+            </div>
+        </div>
+
+        <!-- All-Time Pie Chart Card -->
+        <div class="report-card">
+            <h2 class="text-center mb-3">All-Time Complaint Status Distribution</h2>
+            <div class="chart-container">
+                <canvas id="allTimePieChart"></canvas>
+            </div>
+        </div>
     </div>
-    <!-- All-Time Pie Chart Card -->
-    <div style="flex: 1 1 350px; min-width: 340px; max-width: 500px; background: #fff; border-radius: 16px; box-shadow: 0 2px 8px #0001; padding: 1.5rem; display: flex; flex-direction: column; justify-content: flex-start;">
-      <h2 class="text-center mb-3">All-Time Complaint Status Distribution</h2>
-      <div style="width:100%; min-height: 320px; display: flex; align-items: center; justify-content: center;">
-        <canvas id="allTimePieChart" height="320"></canvas>
-      </div>
-    </div>
-  </div>
 </section>
 
 <!-- Linking CSS and JS -->
@@ -336,22 +298,130 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Restore scroll position if available
-    const savedScroll = sessionStorage.getItem('scrollY');
-    if (savedScroll !== null) {
-        window.scrollTo(0, parseInt(savedScroll, 10));
-        sessionStorage.removeItem('scrollY');
-    }
 
-    // Attach to the filter form
-    const filterForm = document.getElementById('reportFilterForm');
-    if (filterForm) {
-        filterForm.addEventListener('submit', function() {
-            sessionStorage.setItem('scrollY', window.scrollY);
-        });
+<style>
+.hero {
+    position: relative;
+    height: 70vh;
+    min-height: 500px;
+    color: white;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    width: 100%;
+}
+
+.hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 2;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 3;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    color: white;
+    line-height: 1.2;
+}
+
+.hero p {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    opacity: 0.95;
+    line-height: 1.6;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    padding: 4rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.feature {
+    text-align: center;
+    padding: 2rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.feature:hover {
+    transform: translateY(-5px);
+}
+
+.feature h3 {
+    color: #2a5298;
+    margin: 1rem 0;
+    font-size: 1.5rem;
+}
+
+.feature p {
+    color: #666;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .hero {
+        height: 60vh;
+        min-height: 400px;
     }
-});
-</script>
+    .hero h1 {
+        font-size: 2.8rem;
+    }
+    .hero p {
+        font-size: 1.3rem;
+    }
+    .features {
+        padding: 2rem 1rem;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero {
+        height: 50vh;
+        min-height: 300px;
+    }
+    .hero h1 {
+        font-size: 2.2rem;
+    }
+    .hero p {
+        font-size: 1.1rem;
+    }
+    .feature {
+        padding: 1.5rem;
+    }
+}
+</style>
 {% endblock %}
